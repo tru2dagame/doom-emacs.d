@@ -43,10 +43,34 @@
 (setq display-line-numbers-type t)
 #+end_src
 
+* Frame size
+[[https://www.reddit.com/r/emacs/comments/9c0a4d/tip_setting_initial_frame_size_and_position/][Tip: Setting initial frame size and position : emacs]]
+#+begin_src emacs-lisp
+;; Set initial frame size and position
+(defun my/set-initial-frame ()
+  (let* ((base-factor 0.81)
+	(a-width (* (display-pixel-width) base-factor))
+        (a-height (* (display-pixel-height) base-factor))
+        (a-left (truncate (/ (- (display-pixel-width) a-width) 2)))
+	(a-top (truncate (/ (- (display-pixel-height) a-height) 2))))
+    (set-frame-position (selected-frame) a-left a-top)
+    (set-frame-size (selected-frame) (truncate a-width)  (truncate a-height) t)))
+(setq frame-resize-pixelwise t)
+(my/set-initial-frame)
+#+end_src
+
 * Define const =is-a-mac=
 #+begin_src emacs-lisp
 (defconst *is-a-mac* (eq system-type 'darwin))
 #+end_src
+
+* Quickly visit Emacs configuration
+#+BEGIN_SRC emacs-lisp
+(defun tru/visit-emacs-config ()
+  (interactive)
+  (find-file "/Users/tru/Dropbox/Apps/emacs/tru/doom-emacs/config.org"))
+(global-set-key (kbd "ESC ESC e") 'tru/visit-emacs-config)
+#+END_SRC
 
 * macOS keybinding
 
@@ -69,6 +93,29 @@
 
 #+RESULTS:
 : ns-do-hide-others
+
+* Editing
+** sudo edit
+#+BEGIN_SRC emacs-lisp
+(use-package! sudo-edit)
+#+END_SRC
+
+** Auto Save
+#+BEGIN_SRC emacs-lisp
+(setq auto-save-visited-file-name t)
+#+END_SRC
+
+** Always indent with spaces
+Never use tabs. Tabs are the devil’s whitespace.
+#+BEGIN_SRC emacs-lisp
+(setq-default indent-tabs-mode nil)
+#+END_SRC
+* Google it
+#+BEGIN_SRC emacs-lisp
+(use-package! google-this
+  :diminish google-this-mode
+  :bind-keymap ("ESC ESC 1" . google-this-mode-submap))
+#+END_SRC
 
 * [[http://sodaware.sdf.org/notes/emacs-daemon-doom-modeline-icons/][Enabling doom-modeline icons when using daemon mode - sodaware.sdf.org]]
 #+begin_src emacs-lisp
@@ -157,7 +204,7 @@
      (global-set-key (kbd "ESC ESC d") 'tru/visit-my-org-daily)
    #+END_SRC
 
-** org ansi
+** Org ansi
    #+begin_src emacs-lisp
      (require 'cl)
      (defun tru/org-redisplay-ansi-source-blocks ()
@@ -189,6 +236,31 @@
        Styles: italic bold underline bolditalics
      ;#+end_export
    #+end_example
+** Display preferences
+
+Make TAB act as if it were issued in a buffer of the language's major mode.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-src-tab-acts-natively t)
+#+END_SRC
+
+When editing a code snippet, use the current window rather than popping open a
+new one (which shows the same information).
+
+#+BEGIN_SRC emacs-lisp
+(setq org-src-window-setup 'current-window)
+#+END_SRC
+
+Quickly insert a block of elisp:
+
+#+BEGIN_SRC emacs-lisp
+(use-package! org
+  :defer t
+   :config
+   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+)
+#+END_SRC
+
 * Display ansi color
   #+begin_src emacs-lisp
     (defun tru/display-ansi-colors ()
@@ -233,7 +305,7 @@
 #+end_src
 * vterm
 #+begin_src emacs-lisp
-(def-package! vterm
+(use-package! vterm
   :defer t
    :config
    (define-key vterm-mode-map (kbd "M-v")                #'vterm-yank)
@@ -259,3 +331,106 @@
   (ivy-posframe-mode +1))
 
 #+end_src
+* TODO Auto-Correct Words
+
+  =void-function ispell-get-word=
+
+  http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
+  https://www.youtube.com/watch?v=fhI_riv_6HM
+
+  =brew install ispell=
+
+  #+BEGIN_SRC emacs-lisp
+    (setq ispell-program-name "/usr/local/bin/ispell")
+
+    (define-key ctl-x-map "\C-i"
+      #'endless/ispell-word-then-abbrev)
+
+    (defun endless/simple-get-word ()
+      (car-safe (save-excursion (ispell-get-word nil))))
+
+    (defun endless/ispell-word-then-abbrev (p)
+      "Call `ispell-word', then create an abbrev for it.
+    With prefix P, create local abbrev. Otherwise it will
+    be global.
+    If there's nothing wrong with the word at point, keep
+    looking for a typo until the beginning of buffer. You can
+    skip typos you don't want to fix with `SPC', and you can
+    abort completely with `C-g'."
+      (interactive "P")
+      (let (bef aft)
+        (save-excursion
+          (while (if (setq bef (endless/simple-get-word))
+                     ;; Word was corrected or used quit.
+                     (if (ispell-word nil 'quiet)
+                         nil ; End the loop.
+                       ;; Also end if we reach `bob'.
+                       (not (bobp)))
+                   ;; If there's no word at point, keep looking
+                   ;; until `bob'.
+                   (not (bobp)))
+            (backward-word)
+            (backward-char))
+          (setq aft (endless/simple-get-word)))
+        (if (and aft bef (not (equal aft bef)))
+            (let ((aft (downcase aft))
+                  (bef (downcase bef)))
+              (define-abbrev
+                (if p local-abbrev-table global-abbrev-table)
+                bef aft)
+              (message "\"%s\" now expands to \"%s\" %sally"
+                       bef aft (if p "loc" "glob")))
+          (user-error "No typo at or before point"))))
+
+    (setq save-abbrevs 'silently)
+    (setq-default abbrev-mode t)
+
+  #+END_SRC
+
+* macOS open iTerm in current directory
+#+BEGIN_SRC emacs-lisp
+(defun my/iterm-goto-filedir-or-home ()
+  "Go to present working dir and focus iterm"
+  (interactive)
+  (do-applescript
+   " do shell script \"open -a iTerm\"\n"
+   )
+  (do-applescript
+   (concat
+    " tell application \"iTerm\"\n"
+    "   tell the current session of current window\n"
+    (format "     write text \"cd %s\" \n"
+            ;; string escaping madness for applescript
+            (replace-regexp-in-string "\\\\" "\\\\\\\\"
+                                      (shell-quote-argument (or default-directory "~"))))
+    "   end tell\n"
+    " end tell\n"
+    " do shell script \"open -a iTerm\"\n"
+    ))
+  )
+#+END_SRC
+* Easy-hugo
+#+BEGIN_SRC emacs-lisp
+(use-package easy-hugo
+  :init
+  ;; Main blog
+  (setq easy-hugo-basedir "~/Dropbox/git/github/hugo-blog/")
+  (setq easy-hugo-url "https://tru2dagame.github.io")
+  (setq easy-hugo-previewtime "300")
+  ;; (define-key global-map (kbd "C-c C-e") 'easy-hugo)
+
+  (setq easy-hugo-bloglist
+        ;; blog2 setting
+        '(((easy-hugo-basedir . "~/Dropbox/git/gitlab/ubnt-hugo-blog/blog-ui/")
+           (easy-hugo-url . "http://blog.stg.ui.com.cn")
+           )
+          ;; blog5 for github pages
+          ;; ((easy-hugo-basedir . "~/src/github.com/masasam/githubpages/")
+          ;;  (easy-hugo-url . "https://yourid.github.io"))
+          ;; ;; blog6 for firebase hosting
+          ;; ((easy-hugo-basedir . "~/src/github.com/masasam/firebase/")
+          ;;  (easy-hugo-url . "https://yourproject.firebaseapp.com"))
+
+          ))
+  :bind ("C-c C-e" . easy-hugo))
+ #+END_SRC
