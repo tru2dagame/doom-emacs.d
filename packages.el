@@ -52,3 +52,5 @@
 ;(package! builtin-package :recipe (:branch "develop"))
 
 (package! ox-twbs)
+(package! sudo-edit)
+(package! google-this)
