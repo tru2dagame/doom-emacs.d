@@ -1,0 +1,261 @@
+#+TITLE: myconfig
+#+AUTHOR: Tru Zhou
+#+STARTUP: overview
+#+PROPERTY: header-args :comments yes :results silent
+
+* Doom default config
+#+begin_src emacs-lisp
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+
+;; Place your private configuration here! Remember, you do not need to run 'doom
+;; refresh' after modifying this file!
+
+;; Key Configuration for Doom as Vanilla Emacs
+(setq evil-default-state 'emacs)
+
+;; Some functionality uses this to identify you, e.g. GPG configuration, email
+;; clients, file templates and snippets.
+(setq user-full-name "Tru"
+      user-mail-address "tru.zhou@gmail.com")
+
+;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
+;; are the three important ones:
+;;
+;; + `doom-font'
+;; + `doom-variable-pitch-font'
+;; + `doom-big-font' -- used for `doom-big-font-mode'
+;;
+;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
+;; font string. You generally only need these two:
+(setq doom-font (font-spec :family "Operator Mono SSm" :size 20))
+
+
+;; There are two ways to load a theme. Both assume the theme is installed and
+;; available. You can either set `doom-theme' or manually load a theme with the
+;; `load-theme' function. These are the defaults.
+(setq doom-theme 'doom-one)
+
+;; If you intend to use org, it is recommended you change this!
+(setq org-directory "~/Dropbox/Org")
+
+;; If you want to change the style of line numbers, change this to `relative' or
+;; `nil' to disable it:
+(setq display-line-numbers-type t)
+#+end_src
+
+* Define const =is-a-mac=
+#+begin_src emacs-lisp
+(defconst *is-a-mac* (eq system-type 'darwin))
+#+end_src
+
+* macOS keybinding
+
+#+begin_src emacs-lisp
+(when *is-a-mac*
+  (setq mac-command-modifier 'meta)
+  (setq mac-option-modifier 'super)
+  ;; Make mouse wheel / trackpad scrolling less jerky
+  (setq mouse-wheel-scroll-amount '(1
+                                    ((shift) . 5)
+                                    ((control))))
+  (dolist (multiple '("" "double-" "triple-"))
+    (dolist (direction '("right" "left"))
+      (global-set-key (read-kbd-macro (concat "<" multiple "wheel-" direction ">")) 'ignore)))
+  (global-set-key (kbd "M-`") 'ns-next-frame)
+  (global-set-key (kbd "M-h") 'ns-do-hide-emacs)
+  (global-set-key (kbd "M-˙") 'ns-do-hide-others)
+  )
+#+end_src
+
+#+RESULTS:
+: ns-do-hide-others
+
+* [[http://sodaware.sdf.org/notes/emacs-daemon-doom-modeline-icons/][Enabling doom-modeline icons when using daemon mode - sodaware.sdf.org]]
+#+begin_src emacs-lisp
+(defun enable-doom-modeline-icons (_frame)
+  (setq doom-modeline-icon t))
+(add-hook 'after-make-frame-functions
+          #'enable-doom-modeline-icons)
+#+end_src
+
+* Org :org:
+** Org note file
+   #+BEGIN_SRC emacs-lisp
+     (setq org-default-notes-file "~/Dropbox/Org/inbox.org")
+   #+END_SRC
+
+** Org Agenda File
+   #+BEGIN_SRC emacs-lisp
+   (setq org-agenda-files "~/Dropbox/Apps/org-agenda/agenda_files")
+   #+END_SRC
+
+** Org Capture for alfred
+   https://github.com/ifitzpat/org-capture-popclip-extension/blob/master/el/alfred-org-capture.el
+
+   #+BEGIN_SRC emacs-lisp
+     (defvar org-mac-context nil)
+
+     ;;; Use org-mac to get link context and insert it to the captured item
+     (add-hook 'org-capture-prepare-finalize-hook
+               (lambda ()
+                 (when (equal
+                        (cdr (assoc 'name (frame-parameters (selected-frame))))
+                        "remember")
+                   (progn
+                     (goto-char (point-max))
+                     (if org-mac-context
+                         (progn
+                           (insert (concat org-mac-context "\n"))
+                           (setq org-mac-context nil))
+                       nil)
+                     (call-interactively 'org-mac-grab-link)))))
+
+     ;;; Delete frame when capture is done
+     (add-hook 'org-capture-after-finalize-hook
+               (lambda ()
+                 (when (equal
+                        (cdr (assoc 'name (frame-parameters (selected-frame))))
+                        "remember")
+                   (delete-frame))))
+
+     ;;; Code:
+     (defun make-orgcapture-frame (&optional mytext)
+       "Create a new frame and run org-capture."
+       (interactive)
+       (setq org-mac-context mytext)
+       (make-frame '((name . "remember") (width . 100) (height . 30)
+                     (top . 400) (left . 300)
+                     ))
+       (select-frame-by-name "remember")
+       (org-capture))
+
+
+
+
+     ;;     (add-to-list 'default-frame-alist '(height . 39))
+     ;;     (add-to-list 'default-frame-alist '(width . 124))
+
+     ;; ;;; Code:
+     ;; ;;; https://github.com/jjasghar/alfred-org-capture
+     ;; (defun make-orgcapture-frame ()
+     ;;   "Create a new frame and run org-capture."
+     ;;   (interactive)
+     ;;   (make-frame '((name . "remember") (width . 124) (height . 39)
+     ;;                 (top . 400) (left . 300)
+     ;;                 (font . "Operator Mono SSm")
+     ;;                 ))
+     ;;   (select-frame-by-name "remember")
+     ;;   (org-capture))
+   #+END_SRC
+
+** Visit daily org file
+
+   #+BEGIN_SRC emacs-lisp
+     (defun tru/visit-my-org-daily ()
+       (interactive)
+       (find-file "~/Dropbox/Org/daily.org"))
+     (global-set-key (kbd "ESC ESC d") 'tru/visit-my-org-daily)
+   #+END_SRC
+
+** org ansi
+   #+begin_src emacs-lisp
+     (require 'cl)
+     (defun tru/org-redisplay-ansi-source-blocks ()
+       "Refresh the display of ANSI text source blocks."
+       (interactive)
+       (org-element-map (org-element-parse-buffer) 'export-block
+         (lambda (export)
+           (when (equalp "ansi" (org-element-property :type export))
+             (let ((begin (org-element-property :begin export))
+                   (end (org-element-property :end export)))
+               (ansi-color-apply-on-region begin end))
+           )
+           )))
+
+     ;(add-to-list 'org-babel-after-execute-hook #'tru/org-redisplay-ansi-source-blocks)
+     ;(org-babel-do-load-languages 'org-babel-load-languages '((shell . t)))
+   #+end_src
+
+   example:
+   #+begin_example
+     ;#+begin_src shell :results output verbatim drawer :wrap export ansi
+       echo "\e[33mTest text\e[0m"
+       echo Styles: '\e[3mitalic\e[0m' '\e[1mbold\e[0m' '\e[4munderline\e[0m' '\e[1m\e[3mbolditalics\e[0m'
+     ;#+end_src
+
+     ;#+RESULTS:
+     ;#+begin_export ansi
+       Test text
+       Styles: italic bold underline bolditalics
+     ;#+end_export
+   #+end_example
+* Display ansi color
+  #+begin_src emacs-lisp
+    (defun tru/display-ansi-colors ()
+      (interactive)
+      (let ((inhibit-read-only t))
+        (ansi-color-apply-on-region (point-min) (point-max))))
+  #+end_src
+* recentf
+#+begin_src emacs-lisp
+(add-hook 'after-init-hook 'recentf-mode)
+(setq-default
+ recentf-max-saved-items 1000
+ recentf-exclude '("/tmp/" "/ssh:"))
+#+end_src
+* defhydra
+** multiple-cursors
+#+begin_src emacs-lisp
+(defhydra hydra-multiple-cursors (:hint nil)
+  "
+ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cursor%s(if (> (mc/num-cursors) 1) \"s\" \"\")
+------------------------------------------------------------------
+ [_p_]   Next     [_n_]   Next     [_l_] Edit lines  [_0_] Insert numbers
+ [_P_]   Skip     [_N_]   Skip     [_a_] Mark all    [_A_] Insert letters
+ [_M-p_] Unmark   [_M-n_] Unmark   [_s_] Search
+ [Click] Cursor at point       [_q_] Quit"
+  ("l" mc/edit-lines :exit t)
+  ("a" mc/mark-all-like-this :exit t)
+  ("n" mc/mark-next-like-this)
+  ("N" mc/skip-to-next-like-this)
+  ("M-n" mc/unmark-next-like-this)
+  ("p" mc/mark-previous-like-this)
+  ("P" mc/skip-to-previous-like-this)
+  ("M-p" mc/unmark-previous-like-this)
+  ("s" mc/mark-all-in-region-regexp :exit t)
+  ("0" mc/insert-numbers :exit t)
+  ("A" mc/insert-letters :exit t)
+  ("<mouse-1>" mc/add-cursor-on-click)
+  ;; Help with click recognition in this hydra
+  ("<down-mouse-1>" ignore)
+  ("<drag-mouse-1>" ignore)
+  ("q" nil))
+#+end_src
+* vterm
+#+begin_src emacs-lisp
+(def-package! vterm
+  :defer t
+   :config
+   (define-key vterm-mode-map (kbd "M-v")                #'vterm-yank)
+   (define-key vterm-mode-map [remap whole-line-or-region-yank]                #'vterm-yank)
+)
+#+end_src
+* ivy-postframe
+#+begin_src emacs-lisp
+(use-package ivy-posframe
+  :after ivy
+  :diminish
+  :config
+  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center))
+        ivy-posframe-height-alist '((t . 20))
+        ivy-posframe-parameters '((internal-border-width . 10))
+        ivy-posframe-width 188
+        )
+
+  ;; (if (member "Menlo" (font-family-list))
+  ;;     (setq ivy-posframe-parameters '((internal-border-width . 10) (font . "Menlo")))
+  ;;   ivy-posframe-parameters '((internal-border-width . 10)))
+  ;; (setq ivy-posframe-width 188)
+  (ivy-posframe-mode +1))
+
+#+end_src
