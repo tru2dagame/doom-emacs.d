@@ -1,3 +1,4 @@
 .emacs.d
 *.bak
 .gnupg
+config.el
