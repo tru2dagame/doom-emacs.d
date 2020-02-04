@@ -54,3 +54,4 @@
 (package! ox-twbs)
 (package! sudo-edit)
 (package! google-this)
+(package! git-auto-commit-mode)

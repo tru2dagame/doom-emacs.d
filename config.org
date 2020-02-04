@@ -205,37 +205,41 @@ Never use tabs. Tabs are the devil’s whitespace.
    #+END_SRC
 
 ** Org ansi
-   #+begin_src emacs-lisp
-     (require 'cl)
-     (defun tru/org-redisplay-ansi-source-blocks ()
-       "Refresh the display of ANSI text source blocks."
-       (interactive)
-       (org-element-map (org-element-parse-buffer) 'export-block
-         (lambda (export)
-           (when (equalp "ansi" (org-element-property :type export))
-             (let ((begin (org-element-property :begin export))
-                   (end (org-element-property :end export)))
-               (ansi-color-apply-on-region begin end))
-           )
-           )))
+#+begin_src emacs-lisp
+(require 'cl)
+(defun tru/org-redisplay-ansi-source-blocks ()
+  "Refresh the display of ANSI text source blocks."
+  (interactive)
+  (org-element-map (org-element-parse-buffer) 'export-block
+    (lambda (export)
+      (when (equalp "ansi" (org-element-property :type export))
+        (let ((begin (org-element-property :begin export))
+              (end (org-element-property :end export)))
+          (ansi-color-apply-on-region begin end))
+        )
+      )))
+(use-package! org
+  :defer t
+  :config
+  (add-to-list 'org-babel-after-execute-hook #'tru/org-redisplay-ansi-source-blocks)
+  (org-babel-do-load-languages 'org-babel-load-languages '((shell . t)))
+)
+#+end_src
 
-     ;(add-to-list 'org-babel-after-execute-hook #'tru/org-redisplay-ansi-source-blocks)
-     ;(org-babel-do-load-languages 'org-babel-load-languages '((shell . t)))
-   #+end_src
+example:
+#+begin_example
+;#+begin_src shell :results output verbatim drawer :wrap export ansi
+echo "\e[33mTest text\e[0m"
+echo Styles: '\e[3mitalic\e[0m' '\e[1mbold\e[0m' '\e[4munderline\e[0m' '\e[1m\e[3mbolditalics\e[0m'
+;#+end_src
 
-   example:
-   #+begin_example
-     ;#+begin_src shell :results output verbatim drawer :wrap export ansi
-       echo "\e[33mTest text\e[0m"
-       echo Styles: '\e[3mitalic\e[0m' '\e[1mbold\e[0m' '\e[4munderline\e[0m' '\e[1m\e[3mbolditalics\e[0m'
-     ;#+end_src
+;#+RESULTS:
+;#+begin_export ansi
+Test text
+Styles: italic bold underline bolditalics
+;#+end_export
+#+end_example
 
-     ;#+RESULTS:
-     ;#+begin_export ansi
-       Test text
-       Styles: italic bold underline bolditalics
-     ;#+end_export
-   #+end_example
 ** Display preferences
 
 Make TAB act as if it were issued in a buffer of the language's major mode.
@@ -387,28 +391,6 @@ Quickly insert a block of elisp:
 
   #+END_SRC
 
-* macOS open iTerm in current directory
-#+BEGIN_SRC emacs-lisp
-(defun my/iterm-goto-filedir-or-home ()
-  "Go to present working dir and focus iterm"
-  (interactive)
-  (do-applescript
-   " do shell script \"open -a iTerm\"\n"
-   )
-  (do-applescript
-   (concat
-    " tell application \"iTerm\"\n"
-    "   tell the current session of current window\n"
-    (format "     write text \"cd %s\" \n"
-            ;; string escaping madness for applescript
-            (replace-regexp-in-string "\\\\" "\\\\\\\\"
-                                      (shell-quote-argument (or default-directory "~"))))
-    "   end tell\n"
-    " end tell\n"
-    " do shell script \"open -a iTerm\"\n"
-    ))
-  )
-#+END_SRC
 * Easy-hugo
 #+BEGIN_SRC emacs-lisp
 (use-package easy-hugo
@@ -434,3 +416,29 @@ Quickly insert a block of elisp:
           ))
   :bind ("C-c C-e" . easy-hugo))
  #+END_SRC
+* Git auto commit
+  #+begin_src emacs-lisp
+    (use-package! git-auto-commit-mode)
+  #+end_src
+* macOS open iTerm in current directory
+#+BEGIN_SRC emacs-lisp
+(defun my/iterm-goto-filedir-or-home ()
+  "Go to present working dir and focus iterm"
+  (interactive)
+  (do-applescript
+   " do shell script \"open -a iTerm\"\n"
+   )
+  (do-applescript
+   (concat
+    " tell application \"iTerm\"\n"
+    "   tell the current session of current window\n"
+    (format "     write text \"cd %s\" \n"
+            ;; string escaping madness for applescript
+            (replace-regexp-in-string "\\\\" "\\\\\\\\"
+                                      (shell-quote-argument (or default-directory "~"))))
+    "   end tell\n"
+    " end tell\n"
+    " do shell script \"open -a iTerm\"\n"
+    ))
+  )
+#+END_SRC
