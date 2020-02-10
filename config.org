@@ -159,6 +159,12 @@
 (my/set-initial-frame)
 #+end_src
 
+* Fill-column
+
+#+begin_src emacs-lisp
+(setq-default fill-column 2000)
+#+end_src
+
 * Define const =is-a-mac=
 #+begin_src emacs-lisp
 (defconst *is-a-mac* (eq system-type 'darwin))
@@ -189,6 +195,8 @@
   (global-set-key (kbd "M-h") 'ns-do-hide-emacs)
   (global-set-key (kbd "M-˙") 'ns-do-hide-others)
   )
+(global-set-key (kbd "M-v") 'yank)
+(global-set-key (kbd "M-V") 'scroll-down)
 #+end_src
 
 #+RESULTS:
@@ -438,7 +446,7 @@ Never use tabs. Tabs are the devil’s whitespace.
 
 ** Org ansi
 #+begin_src emacs-lisp
-(require 'cl)
+;(require 'cl)
 (defun tru/org-redisplay-ansi-source-blocks ()
   "Refresh the display of ANSI text source blocks."
   (interactive)
@@ -551,16 +559,14 @@ Quickly insert a block of elisp:
 #+end_src
 * vterm
 #+begin_src emacs-lisp
-(use-package! vterm
-  :defer t
-   :config
+(after! vterm
    (define-key vterm-mode-map (kbd "M-v")                #'vterm-yank)
    (define-key vterm-mode-map [remap whole-line-or-region-yank]                #'vterm-yank)
 )
 #+end_src
 * ivy-postframe
 #+begin_src emacs-lisp
-(use-package ivy-posframe
+(use-package! ivy-posframe
   :after ivy
   :diminish
   :config
@@ -662,6 +668,14 @@ Quickly insert a block of elisp:
   #+begin_src emacs-lisp
     (use-package! git-auto-commit-mode)
   #+end_src
+* Server mode
+
+#+begin_src emacs-lisp
+(use-package! server
+  :ensure nil
+  :hook (after-init . server-mode))
+#+end_src
+
 * macOS open iTerm in current directory
 #+BEGIN_SRC emacs-lisp
 (defun my/iterm-goto-filedir-or-home ()
