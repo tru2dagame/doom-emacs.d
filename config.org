@@ -117,24 +117,156 @@ Never use tabs. Tabs are the devil’s whitespace.
   :bind-keymap ("ESC ESC 1" . google-this-mode-submap))
 #+END_SRC
 
-* [[http://sodaware.sdf.org/notes/emacs-daemon-doom-modeline-icons/][Enabling doom-modeline icons when using daemon mode - sodaware.sdf.org]]
+* Org :org:
+** Org settings from purcell
 #+begin_src emacs-lisp
-(defun enable-doom-modeline-icons (_frame)
-  (setq doom-modeline-icon t))
-(add-hook 'after-make-frame-functions
-          #'enable-doom-modeline-icons)
+(after! org
+;; Various preferences
+(setq org-log-done t
+      org-log-into-drawer t
+      org-edit-timestamp-down-means-later t
+      org-hide-emphasis-markers t
+      org-catch-invisible-edits 'show
+      org-export-coding-system 'utf-8
+      org-fast-tag-selection-single-key 'expert
+      org-html-validation-link nil
+      org-export-kill-product-buffer-when-displayed t
+      org-tags-column 80)
+
+(setq org-support-shift-select t)
+(setq org-capture-templates
+      `(("t" "todo" entry (file "")  ; "" => `org-default-notes-file'
+         "* NEXT %?\n%U\n" :clock-resume t)
+        ("n" "note" entry (file "")
+         "* %? :NOTE:\n%U\n%a\n" :clock-resume t)
+        ))
+(setq org-refile-use-cache nil)
+)
+
+;; Re-align tags when window shape changes
+(after! 'org-agenda
+  (add-hook 'org-agenda-mode-hook
+            (lambda () (add-hook 'window-configuration-change-hook 'org-agenda-align-tags nil t))))
+
+(after! org
+;;; To-do settings
+(setq org-todo-keywords
+      (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!/!)")
+              (sequence "PROJECT(p)" "|" "DONE(d!/!)" "CANCELLED(c@/!)")
+              (sequence "WAITING(w@/!)" "DELEGATED(e!)" "HOLD(h)" "|" "CANCELLED(c@/!)")))
+      org-todo-repeat-to-state "NEXT")
+
+(setq org-todo-keyword-faces
+      (quote (("NEXT" :inherit warning)
+              ("PROJECT" :inherit font-lock-string-face))))
+
+(setq-default org-agenda-clockreport-parameter-plist '(:link t :maxlevel 3))
+
+
+(let ((active-project-match "-INBOX/PROJECT"))
+
+  (setq org-stuck-projects
+        `(,active-project-match ("NEXT")))
+
+  (setq org-agenda-compact-blocks t
+        org-agenda-sticky t
+        org-agenda-start-on-weekday nil
+        org-agenda-span 'day
+        org-agenda-include-diary nil
+        org-agenda-sorting-strategy
+        '((agenda habit-down time-up user-defined-up effort-up category-keep)
+          (todo category-up effort-up)
+          (tags category-up effort-up)
+          (search category-up))
+        org-agenda-window-setup 'current-window
+        org-agenda-custom-commands
+        `(("N" "Notes" tags "NOTE"
+           ((org-agenda-overriding-header "Notes")
+            (org-tags-match-list-sublevels t)))
+          ("g" "GTD"
+           ((agenda "" nil)
+            (tags "INBOX"
+                  ((org-agenda-overriding-header "Inbox")
+                   (org-tags-match-list-sublevels nil)))
+            (stuck ""
+                   ((org-agenda-overriding-header "Stuck Projects")
+                    (org-agenda-tags-todo-honor-ignore-options t)
+                    (org-tags-match-list-sublevels t)
+                    (org-agenda-todo-ignore-scheduled 'future)))
+            (tags-todo "-INBOX"
+                       ((org-agenda-overriding-header "Next Actions")
+                        (org-agenda-tags-todo-honor-ignore-options t)
+                        (org-agenda-todo-ignore-scheduled 'future)
+                        (org-agenda-skip-function
+                         '(lambda ()
+                            (or (org-agenda-skip-subtree-if 'todo '("HOLD" "WAITING"))
+                                (org-agenda-skip-entry-if 'nottodo '("NEXT")))))
+                        (org-tags-match-list-sublevels t)
+                        (org-agenda-sorting-strategy
+                         '(todo-state-down effort-up category-keep))))
+            (tags-todo ,active-project-match
+                       ((org-agenda-overriding-header "Projects")
+                        (org-tags-match-list-sublevels t)
+                        (org-agenda-sorting-strategy
+                         '(category-keep))))
+            (tags-todo "-INBOX/-NEXT"
+                       ((org-agenda-overriding-header "Orphaned Tasks")
+                        (org-agenda-tags-todo-honor-ignore-options t)
+                        (org-agenda-todo-ignore-scheduled 'future)
+                        (org-agenda-skip-function
+                         '(lambda ()
+                            (or (org-agenda-skip-subtree-if 'todo '("PROJECT" "HOLD" "WAITING" "DELEGATED"))
+                                (org-agenda-skip-subtree-if 'nottododo '("TODO")))))
+                        (org-tags-match-list-sublevels t)
+                        (org-agenda-sorting-strategy
+                         '(category-keep))))
+            (tags-todo "/WAITING"
+                       ((org-agenda-overriding-header "Waiting")
+                        (org-agenda-tags-todo-honor-ignore-options t)
+                        (org-agenda-todo-ignore-scheduled 'future)
+                        (org-agenda-sorting-strategy
+                         '(category-keep))))
+            (tags-todo "/DELEGATED"
+                       ((org-agenda-overriding-header "Delegated")
+                        (org-agenda-tags-todo-honor-ignore-options t)
+                        (org-agenda-todo-ignore-scheduled 'future)
+                        (org-agenda-sorting-strategy
+                         '(category-keep))))
+            (tags-todo "-INBOX"
+                       ((org-agenda-overriding-header "On Hold")
+                        (org-agenda-skip-function
+                         '(lambda ()
+                            (or (org-agenda-skip-subtree-if 'todo '("WAITING"))
+                                (org-agenda-skip-entry-if 'nottodo '("HOLD")))))
+                        (org-tags-match-list-sublevels nil)
+                        (org-agenda-sorting-strategy
+                         '(category-keep))))
+            ;; (tags-todo "-NEXT"
+            ;;            ((org-agenda-overriding-header "All other TODOs")
+            ;;             (org-match-list-sublevels t)))
+            )))))
+)
+
+(add-hook 'org-agenda-mode-hook 'hl-line-mode)
+
+;;; Archiving
+(after! org
+(setq org-archive-mark-done nil)
+(setq org-archive-location "%s_archive::* Archive")
+)
 #+end_src
 
-* Org :org:
 ** Org note file
-   #+BEGIN_SRC emacs-lisp
-     (setq org-default-notes-file "~/Dropbox/Org/inbox.org")
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+(after! org
+  (setq org-default-notes-file "~/Dropbox/Org/inbox.org"))
+#+END_SRC
 
 ** Org Agenda File
-   #+BEGIN_SRC emacs-lisp
-   (setq org-agenda-files "~/Dropbox/Apps/org-agenda/agenda_files")
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+(after! org
+  (setq org-agenda-files "~/Dropbox/Apps/org-agenda/agenda_files"))
+#+END_SRC
 
 ** Org Capture for alfred
    https://github.com/ifitzpat/org-capture-popclip-extension/blob/master/el/alfred-org-capture.el
@@ -245,25 +377,35 @@ Styles: italic bold underline bolditalics
 Make TAB act as if it were issued in a buffer of the language's major mode.
 
 #+BEGIN_SRC emacs-lisp
-(setq org-src-tab-acts-natively t)
+(after! org
+  (setq org-src-tab-acts-natively t))
 #+END_SRC
 
 When editing a code snippet, use the current window rather than popping open a
 new one (which shows the same information).
 
 #+BEGIN_SRC emacs-lisp
-(setq org-src-window-setup 'current-window)
+(after! org
+  (setq org-src-window-setup 'current-window))
 #+END_SRC
 
 Quickly insert a block of elisp:
 
 #+BEGIN_SRC emacs-lisp
-(use-package! org
-  :defer t
-   :config
+(after! org
    (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 )
 #+END_SRC
+
+** Ob-async
+#+begin_src emacs-lisp
+;;(use-package! ob-async)
+#+end_src
+
+** Org-rifle
+#+begin_src emacs-lisp
+(use-package! helm-org-rifle)
+#+end_src
 
 * Display ansi color
   #+begin_src emacs-lisp
