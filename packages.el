@@ -55,3 +55,7 @@
 (package! sudo-edit)
 (package! google-this)
 (package! git-auto-commit-mode)
+(package! grab-mac-link)
+(package! ivy-posframe)
+(package! helm-org-rifle)
+(package! nyan-mode)
