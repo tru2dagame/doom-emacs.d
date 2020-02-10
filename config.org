@@ -43,6 +43,106 @@
 (setq display-line-numbers-type t)
 #+end_src
 
+* Font
+#+begin_src emacs-lisp
+(when (display-graphic-p)
+  (when (eq window-system 'ns)
+    (setq ns-use-thin-smoothing t
+          ns-use-native-fullscreen nil
+          ns-use-fullscreen-animation t))
+  ;; fonts
+  (cl-loop for font in '("Operator Mono Lig"
+                         "Operator Mono"
+                         "Fira Mono"
+                         "Fira Code")
+           if (member font (font-family-list))
+           return
+           (setq doom-font (font-spec :family font :size 12.5)
+                 doom-big-font (font-spec :family font :size 21)))
+
+  (if (member "Operator SSm" (font-family-list))
+      (setq doom-variable-pitch-font (font-spec :family "Operator SSm"))
+    (when (member "Fira Sans" (font-family-list))
+      (setq doom-variable-pitch-font (font-spec :family "Fira Sans"))))
+  (when (member "Hiragino Sans GB" (font-family-list))
+    (setq doom-unicode-font (font-spec :family "Hiragino Sans GB" :size 14.5)))
+
+  (when (member "Noto Color Emoji" (font-family-list))
+    (set-fontset-font 't 'symbol
+      (font-spec :family "Noto Color Emoji")
+      nil 'prepend))
+
+  (cl-loop for font in '("Hiragino Sans GB"
+                         "Sarasa Mono SC"
+                         "Noto Sans CJK SC"
+                         "Source Han Sans SC")
+           if (member font (font-family-list))
+           return
+           (set-fontset-font t 'han (font-spec :family font) nil 'prepend))
+
+  ;;(add-hook 'window-setup-hook #'toggle-frame-maximized)
+  (add-hook 'window-setup-hook #'+ui/toggle-transparency)
+  )
+#+end_src
+
+* Doom-modeline
+#+begin_src emacs-lisp
+(after! doom-modeline
+  (setq doom-modeline-icon t
+        doom-modeline-major-mode-icon t
+        doom-modeline-major-mode-color-icon t
+        doom-modeline-buffer-state-icon t
+        doom-modeline-buffer-modification-icon t
+        doom-modeline-enable-word-count t
+        doom-modeline-indent-info t))
+#+end_src
+
+** [[http://sodaware.sdf.org/notes/emacs-daemon-doom-modeline-icons/][Enabling doom-modeline icons when using daemon mode - sodaware.sdf.org]]
+#+begin_src emacs-lisp
+(defun enable-doom-modeline-icons (_frame)
+  (setq doom-modeline-icon t))
+(add-hook 'after-make-frame-functions
+          #'enable-doom-modeline-icons)
+#+end_src
+
+* UI
+** Whitespace
+#+begin_src emacs-lisp
+  (setq show-trailing-whitespace t)
+#+end_src
+
+** toggle-transparency
+#+begin_src emacs-lisp
+(defun +ui/toggle-transparency ()
+  (interactive)
+  (let ((alpha (frame-parameter nil 'alpha)))
+    (set-frame-parameter
+      nil 'alpha
+      (if (eql (cond ((numberp alpha) alpha)
+                     ((numberp (cdr alpha)) (cdr alpha))
+                     ;; Also handle undocumented (<active> <inactive>) form.
+                     ((numberp (cadr alpha)) (cadr alpha)))
+               100)
+          '(90 . 80) '(100 . 100)))))
+
+(map!
+ "s-u"                         #'+ui/toggle-transparency
+ :leader
+ :prefix ("t" . "toggle")
+ :desc "Transparency"
+ :n "t" #'+ui/toggle-transparency)
+#+end_src
+
+** nyan-mode
+#+begin_src emacs-lisp
+(use-package! nyan-mode
+  :after doom-modeline
+  :init
+  (setq nyan-animate-nyancat t
+        nyan-wavy-trail t)
+  (nyan-mode t))
+#+end_src
+
 * Frame size
 [[https://www.reddit.com/r/emacs/comments/9c0a4d/tip_setting_initial_frame_size_and_position/][Tip: Setting initial frame size and position : emacs]]
 #+begin_src emacs-lisp
