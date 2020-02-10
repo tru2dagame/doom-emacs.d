@@ -1,4 +1,4 @@
-#+TITLE: myconfig
+#+TITLE: config
 #+AUTHOR: Tru Zhou
 #+STARTUP: overview
 #+PROPERTY: header-args :comments yes :results silent
