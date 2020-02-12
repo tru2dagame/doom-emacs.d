@@ -60,3 +60,4 @@
 (package! helm-org-rifle)
 (package! nyan-mode)
 (package! edit-server)
+(package! whitespace-cleanup-mode)

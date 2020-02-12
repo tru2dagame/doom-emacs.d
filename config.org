@@ -73,7 +73,27 @@
 * UI
 ** Whitespace
 #+begin_src emacs-lisp
-(setq show-trailing-whitespace t)
+(ws-butler-global-mode -1)
+
+(setq-default show-trailing-whitespace t)
+
+;;; Whitespace
+
+(defun sanityinc/show-trailing-whitespace ()
+  "Enable display of trailing whitespace in this buffer."
+  (setq-local show-trailing-whitespace t))
+
+(dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
+  (add-hook hook 'sanityinc/show-trailing-whitespace))
+
+
+(use-package! whitespace-cleanup-mode
+  :diminish whitespace-cleanup-mode)
+(add-hook 'after-init-hook 'global-whitespace-cleanup-mode)
+
+(global-set-key [remap just-one-space] 'cycle-spacing)
+
+
 #+end_src
 
 ** toggle-transparency
@@ -180,6 +200,7 @@
 
 ** Auto Save
 #+BEGIN_SRC emacs-lisp
+(auto-save-visited-mode +1)
 (setq auto-save-visited-file-name t)
 #+END_SRC
 
@@ -188,6 +209,7 @@ Never use tabs. Tabs are the devil’s whitespace.
 #+BEGIN_SRC emacs-lisp
 (setq-default indent-tabs-mode nil)
 #+END_SRC
+
 * Google it
 #+BEGIN_SRC emacs-lisp
 (use-package! google-this
@@ -416,7 +438,6 @@ Never use tabs. Tabs are the devil’s whitespace.
 
 ** Org ansi
 #+begin_src emacs-lisp
-;(require 'cl)
 (defun tru/org-redisplay-ansi-source-blocks ()
   "Refresh the display of ANSI text source blocks."
   (interactive)
@@ -634,10 +655,15 @@ Quickly insert a block of elisp:
           ))
   :bind ("C-c C-e" . easy-hugo))
  #+END_SRC
-* Git auto commit
-  #+begin_src emacs-lisp
-    (use-package! git-auto-commit-mode)
-  #+end_src
+* TODO Git auto commit
+#+begin_src emacs-lisp
+(use-package! git-auto-commit-mode
+  :config
+  ;;(setq shell-command-prompt-show-cwd t)
+  (setq-default gac-automatically-push-p t)
+  (setq-default gac-debounce-interval 60)
+)
+#+end_src
 * Server mode
 
 #+begin_src emacs-lisp
@@ -677,3 +703,4 @@ https://chrome.google.com/webstore/detail/edit-with-emacs/ljobjlafonikaiipfkggjb
     ))
   )
 #+END_SRC
+
