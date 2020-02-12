@@ -46,41 +46,6 @@
 * Font
 #+begin_src emacs-lisp
 (when (display-graphic-p)
-  (when (eq window-system 'ns)
-    (setq ns-use-thin-smoothing t
-          ns-use-native-fullscreen nil
-          ns-use-fullscreen-animation t))
-  ;; fonts
-  (cl-loop for font in '("Operator Mono Lig"
-                         "Operator Mono"
-                         "Fira Mono"
-                         "Fira Code")
-           if (member font (font-family-list))
-           return
-           (setq doom-font (font-spec :family font :size 12.5)
-                 doom-big-font (font-spec :family font :size 21)))
-
-  (if (member "Operator SSm" (font-family-list))
-      (setq doom-variable-pitch-font (font-spec :family "Operator SSm"))
-    (when (member "Fira Sans" (font-family-list))
-      (setq doom-variable-pitch-font (font-spec :family "Fira Sans"))))
-  (when (member "Hiragino Sans GB" (font-family-list))
-    (setq doom-unicode-font (font-spec :family "Hiragino Sans GB" :size 14.5)))
-
-  (when (member "Noto Color Emoji" (font-family-list))
-    (set-fontset-font 't 'symbol
-      (font-spec :family "Noto Color Emoji")
-      nil 'prepend))
-
-  (cl-loop for font in '("Hiragino Sans GB"
-                         "Sarasa Mono SC"
-                         "Noto Sans CJK SC"
-                         "Source Han Sans SC")
-           if (member font (font-family-list))
-           return
-           (set-fontset-font t 'han (font-spec :family font) nil 'prepend))
-
-  ;;(add-hook 'window-setup-hook #'toggle-frame-maximized)
   (add-hook 'window-setup-hook #'+ui/toggle-transparency)
   )
 #+end_src
@@ -93,7 +58,7 @@
         doom-modeline-major-mode-color-icon t
         doom-modeline-buffer-state-icon t
         doom-modeline-buffer-modification-icon t
-        doom-modeline-enable-word-count t
+        doom-modeline-enable-word-count nil
         doom-modeline-indent-info t))
 #+end_src
 
@@ -108,7 +73,7 @@
 * UI
 ** Whitespace
 #+begin_src emacs-lisp
-  (setq show-trailing-whitespace t)
+(setq show-trailing-whitespace t)
 #+end_src
 
 ** toggle-transparency
@@ -512,7 +477,7 @@ Quickly insert a block of elisp:
 
 ** Ob-async
 #+begin_src emacs-lisp
-;;(use-package! ob-async)
+(use-package! ob-async)
 #+end_src
 
 ** Org-rifle
@@ -677,8 +642,17 @@ Quickly insert a block of elisp:
 
 #+begin_src emacs-lisp
 (use-package! server
-  :ensure nil
   :hook (after-init . server-mode))
+#+end_src
+* Edit server
+https://chrome.google.com/webstore/detail/edit-with-emacs/ljobjlafonikaiipfkggjbhkghgicgoh
+#+begin_src emacs-lisp
+(use-package! edit-server
+  :config
+  (edit-server-start)
+  (setq edit-server-default-major-mode 'markdown-mode)
+  (setq edit-server-new-frame nil)
+)
 #+end_src
 
 * macOS open iTerm in current directory

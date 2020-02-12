@@ -59,3 +59,4 @@
 (package! ivy-posframe)
 (package! helm-org-rifle)
 (package! nyan-mode)
+(package! edit-server)
