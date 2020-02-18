@@ -539,6 +539,25 @@ Quickly insert a block of elisp:
 (add-hook 'org-agenda-finalize-hook #'my:org-agenda-time-grid-spacing)
 #+end_src
 
+** Org debug
+#+begin_src emacs-lisp
+;; debug
+(defun tru/tt-parse-buff ()
+  "2019-01-14"
+  (interactive)
+  (let ((tt (org-element-parse-buffer )))
+    (with-output-to-temp-buffer "*xah temp out*"
+      (print tt))))
+
+(defun tru/tt-headline ()
+  "2019-01-14"
+  (interactive)
+  (let ((tt (org-element-parse-buffer 'headline )))
+    (with-output-to-temp-buffer "*xah temp out*"
+      (print tt))))
+
+#+end_src
+
 * Display ansi color
   #+begin_src emacs-lisp
     (defun tru/display-ansi-colors ()
