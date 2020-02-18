@@ -431,7 +431,7 @@ Never use tabs. Tabs are the devil’s whitespace.
 
 ** Org ansi
 #+begin_src emacs-lisp
-(defun tru/org-redisplay-ansi-source-blocks ()
+(defun tru/org-redisplay-ansi-export-blocks ()
   "Refresh the display of ANSI text source blocks."
   (interactive)
   (org-element-map (org-element-parse-buffer) 'export-block
@@ -439,13 +439,23 @@ Never use tabs. Tabs are the devil’s whitespace.
       (when (equalp "ansi" (org-element-property :type export))
         (let ((begin (org-element-property :begin export))
               (end (org-element-property :end export)))
-          (ansi-color-apply-on-region begin end))
-        )
-      )))
+          (ansi-color-apply-on-region begin end))))))
+
+(defun tru/org-redisplay-ansi-example-blocks ()
+  "Refresh the display of ANSI text source blocks."
+  (interactive)
+  (org-element-map (org-element-parse-buffer) 'example-block
+    (lambda (example)
+      (when (equalp "ansi" (org-element-property :switches example))
+        (let ((begin (org-element-property :begin example))
+              (end (org-element-property :end example)))
+          (ansi-color-apply-on-region begin end))))))
+
 (use-package! org
   :defer t
   :config
-  (add-to-list 'org-babel-after-execute-hook #'tru/org-redisplay-ansi-source-blocks)
+  (add-to-list 'org-babel-after-execute-hook #'tru/org-redisplay-ansi-export-blocks)
+  (add-to-list 'org-babel-after-execute-hook #'tru/org-redisplay-ansi-example-blocks)
   (org-babel-do-load-languages 'org-babel-load-languages '((shell . t)))
 )
 #+end_src
