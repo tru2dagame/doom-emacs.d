@@ -348,6 +348,11 @@ Never use tabs. Tabs are the devil’s whitespace.
 (setq org-archive-location "%s_archive::* Archive")
 )
 #+end_src
+** org-mode automatically wrap lines
+#+begin_src emacs-lisp
+(after! org
+(visual-line-mode 1))
+#+end_src
 
 ** Org note file
 #+BEGIN_SRC emacs-lisp
