@@ -60,3 +60,5 @@
 (package! nyan-mode)
 (package! edit-server)
 (package! whitespace-cleanup-mode)
+(package! pinyinlib)
+(package! pinyin-search)
