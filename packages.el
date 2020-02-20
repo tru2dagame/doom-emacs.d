@@ -62,3 +62,4 @@
 (package! whitespace-cleanup-mode)
 (package! pinyinlib)
 (package! pinyin-search)
+(package! youdao-dictionary)

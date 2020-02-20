@@ -775,6 +775,15 @@ https://chrome.google.com/webstore/detail/edit-with-emacs/ljobjlafonikaiipfkggjb
 (use-package! pinyin-search)
 #+end_src
 
+#+begin_src emacs-lisp
+(use-package! youdao-dictionary
+  :config
+  (setq url-automatic-caching t)
+  ;; Example Key binding
+  (global-set-key (kbd "C-c y") 'youdao-dictionary-search-at-point)
+)
+#+end_src
+
 * macOS open iTerm in current directory
 #+BEGIN_SRC emacs-lisp
 (defun my/iterm-goto-filedir-or-home ()
