@@ -201,7 +201,7 @@
 #+BEGIN_SRC emacs-lisp
 (auto-save-visited-mode +1)
 (setq auto-save-visited-file-name t)
-(setq auto-save-visited-interval 8)
+(setq auto-save-visited-interval 240)
 #+END_SRC
 
 ** Always indent with spaces
