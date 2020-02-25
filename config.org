@@ -120,6 +120,11 @@
   (nyan-mode t))
 #+end_src
 
+** tabs
+#+begin_src emacs-lisp
+(centaur-tabs-group-by-projectile-project)
+#+end_src
+
 * Frame size
 [[https://www.reddit.com/r/emacs/comments/9c0a4d/tip_setting_initial_frame_size_and_position/][Tip: Setting initial frame size and position : emacs]]
 #+begin_src emacs-lisp
@@ -160,8 +165,8 @@
 (global-set-key (kbd "ESC ESC e") 'tru/visit-emacs-config)
 #+END_SRC
 
-* macOS keybinding
-
+* keybinding
+** macOS
 #+begin_src emacs-lisp
 (when *is-a-mac*
   (setq mac-command-modifier 'meta)
@@ -181,8 +186,10 @@
 (global-set-key (kbd "M-V") 'scroll-down)
 #+end_src
 
-#+RESULTS:
-: ns-do-hide-others
+** Others
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+#+end_src
 
 * Editing
 ** sudo edit
