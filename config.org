@@ -573,12 +573,16 @@ Quickly insert a block of elisp:
       (let ((inhibit-read-only t))
         (ansi-color-apply-on-region (point-min) (point-max))))
   #+end_src
-* recentf
+* CANCELLED recentf
+CLOSED: [2020-02-26 Wed 03:48]
+:LOGBOOK:
+- State "CANCELLED"  from              [2020-02-26 Wed 03:48]
+:END:
 #+begin_src emacs-lisp
-(add-hook 'after-init-hook 'recentf-mode)
-(setq-default
- recentf-max-saved-items 1000
- recentf-exclude '("/tmp/" "/ssh:"))
+;; (add-hook 'after-init-hook 'recentf-mode)
+;; (setq-default
+;;  recentf-max-saved-items 1000
+;;  recentf-exclude '("/tmp/" "/ssh:"))
 #+end_src
 * defhydra
 ** multiple-cursors
