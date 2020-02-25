@@ -619,25 +619,30 @@ CLOSED: [2020-02-26 Wed 03:48]
    (define-key vterm-mode-map [remap whole-line-or-region-yank]                #'vterm-yank)
 )
 #+end_src
-* ivy-postframe
+* CANCELLED ivy-postframe
+CLOSED: [2020-02-26 Wed 03:53]
+:LOGBOOK:
+- State "CANCELLED"  from              [2020-02-26 Wed 03:53] \\
+  Try to use emacs default!
+:END:
 #+begin_src emacs-lisp
-(use-package! ivy-posframe
-  :after ivy
-  :diminish
-  :config
-  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center))
-        ivy-posframe-height-alist '((t . 20))
-        ivy-posframe-parameters '((internal-border-width . 10))
-        ivy-posframe-width 188
-        )
+;; (use-package! ivy-posframe
+;;   :after ivy
+;;   :diminish
+;;   :config
+;;   (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center))
+;;         ivy-posframe-height-alist '((t . 35))
+;;         ivy-posframe-parameters '((internal-border-width . 10))
+;;         ivy-posframe-width 200
+;;         )
 
-  ;; (if (member "Menlo" (font-family-list))
-  ;;     (setq ivy-posframe-parameters '((internal-border-width . 10) (font . "Menlo")))
-  ;;   ivy-posframe-parameters '((internal-border-width . 10)))
-  ;; (setq ivy-posframe-width 188)
-  (ivy-posframe-mode +1))
-
+;;   ;; (if (member "Menlo" (font-family-list))
+;;   ;;     (setq ivy-posframe-parameters '((internal-border-width . 10) (font . "Menlo")))
+;;   ;;   ivy-posframe-parameters '((internal-border-width . 10)))
+;;   ;; (setq ivy-posframe-width 188)
+;;   (ivy-posframe-mode -1))
 #+end_src
+
 * TODO Auto-Correct Words
 
   =void-function ispell-get-word=
