@@ -63,3 +63,4 @@
 (package! pinyinlib)
 (package! pinyin-search)
 (package! youdao-dictionary)
+(package! ob-tmux)
