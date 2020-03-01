@@ -573,6 +573,18 @@ Quickly insert a block of elisp:
 (add-hook 'org-agenda-finalize-hook #'my:org-agenda-time-grid-spacing)
 #+end_src
 
+** Org babel
+Unset ~org-babel-execute-buffer~ keybinding
+because I thought its dangerous.
+#+begin_src emacs-lisp
+(define-key helm-org-rifle-occur-map "\C-c\C-v\C-b" nil)
+(define-key helm-org-rifle-occur-map "\C-c\C-vb" nil)
+(define-key org-babel-map "\C-b" nil)
+(define-key org-babel-map "b" nil)
+(define-key org-mode-map "\C-c\C-v\C-b" nil)
+(define-key org-mode-map "\C-c\C-vb" nil)
+#+end_src
+
 ** Org debug
 #+begin_src emacs-lisp
 ;; debug
