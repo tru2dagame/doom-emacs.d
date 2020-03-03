@@ -55,7 +55,6 @@
 #+begin_src emacs-lisp
 (after! doom-modeline
   (setq doom-modeline-icon t
-        ;; https://github.com/hlissner/doom-emacs/issues/2597
         doom-modeline-major-mode-icon t
         doom-modeline-major-mode-color-icon t
         doom-modeline-buffer-state-icon t
