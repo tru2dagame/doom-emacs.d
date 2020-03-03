@@ -53,15 +53,16 @@
 
 * Doom-modeline
 #+begin_src emacs-lisp
-(after! doom-modeline
+;;(after! doom-modeline
   (setq doom-modeline-icon t
         ;; https://github.com/hlissner/doom-emacs/issues/2597
-        ;;doom-modeline-major-mode-icon t
+        doom-modeline-major-mode-icon t
         doom-modeline-major-mode-color-icon t
         doom-modeline-buffer-state-icon t
         doom-modeline-buffer-modification-icon t
         doom-modeline-enable-word-count nil
-        doom-modeline-indent-info t))
+        doom-modeline-indent-info t)
+;;)
 #+end_src
 
 ** [[http://sodaware.sdf.org/notes/emacs-daemon-doom-modeline-icons/][Enabling doom-modeline icons when using daemon mode - sodaware.sdf.org]]
