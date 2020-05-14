@@ -230,6 +230,16 @@ Never use tabs. Tabs are the devil’s whitespace.
 (setq-default indent-tabs-mode nil)
 #+END_SRC
 
+** undo
+#+begin_src emacs-lisp
+(after! undo-fu
+  (define-key undo-fu-mode-map [remap undo] nil)
+  (define-key global-map (kbd "C-/") nil)
+  (global-set-key (kbd "C-/") 'undo)
+  (global-set-key (kbd "M-z") 'undo-fu-only-undo)
+  (global-set-key (kbd "M-Z") 'undo-fu-only-redo)
+)
+#+end_src
 * Google it
 #+BEGIN_SRC emacs-lisp
 (use-package! google-this
