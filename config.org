@@ -240,6 +240,12 @@ Never use tabs. Tabs are the devil’s whitespace.
   (global-set-key (kbd "M-Z") 'undo-fu-only-redo)
 )
 #+end_src
+
+* isearch enhancements
+#+begin_src emacs-lisp
+(setq search-whitespace-regexp ".*?")
+#+end_src
+
 * RG
 #+begin_src emacs-lisp
 (use-package wgrep
