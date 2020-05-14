@@ -64,3 +64,5 @@
 (package! pinyin-search)
 (package! youdao-dictionary)
 (package! ob-tmux)
+(package! wgrep)
+(package! rg)
