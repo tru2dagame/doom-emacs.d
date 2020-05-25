@@ -66,4 +66,4 @@
 (package! ob-tmux)
 (package! wgrep)
 (package! rg)
-;;(package! undo-tree)
+(package! undo-tree :pin "5b6df03781495d8a25695d846b0cce496d3d3058")
