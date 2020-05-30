@@ -287,6 +287,16 @@ Never use tabs. Tabs are the devil’s whitespace.
   (global-set-key (kbd "M-z") 'undo-fu-only-undo)
   (global-set-key (kbd "M-Z") 'undo-fu-only-redo)
 )
+
+(after! undo-tree
+  (define-key undo-tree-map [remap undo] nil)
+  (define-key undo-tree-map (kbd "C-/") nil)
+  (define-key global-map (kbd "C-/") nil)
+  (global-set-key (kbd "C-/") 'undo)
+  (global-set-key (kbd "M-z") 'undo-tree-undo)
+  (global-set-key (kbd "M-Z") 'undo-tree-redo)
+)
+(global-set-key (kbd "C-/") 'undo)
 #+end_src
 
 * isearch enhancements
