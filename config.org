@@ -599,6 +599,7 @@ https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/
 
 ** Org ansi
 #+begin_src emacs-lisp
+(require 'cl)
 (defun tru/org-redisplay-ansi-export-blocks ()
   "Refresh the display of ANSI text source blocks."
   (interactive)
