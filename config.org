@@ -208,7 +208,7 @@
 
 ** Others
 #+begin_src emacs-lisp
-(global-set-key (kbd "C-x C-b") 'ibuffer)
+;;(global-set-key (kbd "C-x C-b") 'ibuffer)
 #+end_src
 
 * Editing
