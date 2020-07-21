@@ -749,6 +749,12 @@ https://emacs-china.org/t/org-mode/13248
 #+begin_src emacs-lisp
 (use-package! valign)
 #+end_src
+
+** Org-roam
+
+#+begin_src emacs-lisp
+(setq org-roam-directory "/Users/tru/Dropbox/Org/uid/")
+#+end_src
 * Display ansi color
   #+begin_src emacs-lisp
     (defun tru/display-ansi-colors ()
