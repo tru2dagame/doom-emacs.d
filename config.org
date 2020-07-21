@@ -743,6 +743,12 @@ because I thought its dangerous.
 
 #+end_src
 
+** Org table valign
+https://emacs-china.org/t/org-mode/13248
+
+#+begin_src emacs-lisp
+(use-package! valign)
+#+end_src
 * Display ansi color
   #+begin_src emacs-lisp
     (defun tru/display-ansi-colors ()
