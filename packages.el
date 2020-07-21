@@ -67,3 +67,4 @@
 (package! wgrep)
 (package! rg)
 ;;(package! undo-tree)
+(package! olivetti)
