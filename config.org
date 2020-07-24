@@ -742,6 +742,16 @@ https://emacs-china.org/t/org-mode/13248
 (setq org-roam-directory "/Users/tru/Dropbox/Org/uid/")
 #+end_src
 
+** Org-mouse
+
+#+begin_src emacs-lisp
+(after! org
+  (setq org-modules
+        (append '(
+                  org-mouse
+                  )org-modules)))
+#+end_src
+
 * Deft
 #+begin_src emacs-lisp
 (setq deft-directory "~/Dropbox/Org")
