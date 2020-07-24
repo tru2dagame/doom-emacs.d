@@ -289,22 +289,6 @@ Never use tabs. Tabs are the devil’s whitespace.
 )
 #+end_src
 
-** olivetti mode
-
-#+begin_src emacs-lisp
-(use-package! olivetti
-  :config
-  (setq-default olivetti-body-width 120)
-  ;(setq olivetti-body-width 90)
-  (setq olivetti-body-width 0.65)
-  (setq olivetti-minimum-body-width 72)
-  (setq olivetti-recall-visual-line-mode-entry-state t)
-)
-
-(add-hook 'org-mode-hook 'turn-on-olivetti-mode)
-(add-hook 'text-mode-hook 'turn-on-olivetti-mode)
-#+end_src
-
 * isearch enhancements
 #+begin_src emacs-lisp
 (setq search-whitespace-regexp ".*?")

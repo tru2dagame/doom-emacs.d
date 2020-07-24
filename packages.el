@@ -67,7 +67,6 @@
 (package! wgrep)
 (package! rg)
 ;;(package! undo-tree)
-(package! olivetti)
 (package! valign
   :recipe (:host github :repo "casouri/valign"
            :files ("valign.el" ))
