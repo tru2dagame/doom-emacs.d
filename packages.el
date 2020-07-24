@@ -72,3 +72,5 @@
            :files ("valign.el" ))
   :pin "6578fe45b143886a963646711cf579240333b4eb")
 (package! yaml-mode)
+
+;;; $DOOMDIR/packages.el end
