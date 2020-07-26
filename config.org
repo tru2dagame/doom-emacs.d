@@ -752,6 +752,13 @@ https://emacs-china.org/t/org-mode/13248
                   )org-modules)))
 #+end_src
 
+** Org display a single inline image
+[[https://www.reddit.com/r/orgmode/comments/hx5keh/display_a_single_inline_image/][Display a single inline image : orgmode]]
+
+#+begin_src emacs-lisp
+(defun org-display-inline-images (&optional include-linked refresh beg end))
+#+end_src
+
 * Deft
 #+begin_src emacs-lisp
 (setq deft-directory "~/Dropbox/Org")
