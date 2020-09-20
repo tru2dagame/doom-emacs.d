@@ -763,7 +763,7 @@ https://emacs-china.org/t/org-mode/13248
 [[https://www.reddit.com/r/orgmode/comments/hx5keh/display_a_single_inline_image/][Display a single inline image : orgmode]]
 
 #+begin_src emacs-lisp
-(defun org-display-inline-images (&optional include-linked refresh beg end))
+;;(defun org-display-inline-images (&optional include-linked refresh beg end))
 #+end_src
 
 * Deft
