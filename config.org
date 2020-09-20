@@ -219,10 +219,17 @@
 
 ** Auto Save
 #+BEGIN_SRC emacs-lisp
-(setq auto-save-visited-file-name t)
-(setq auto-save-visited-interval 120)
-(auto-save-visited-mode +1)
+;; (setq auto-save-visited-file-name t)
+;; (setq auto-save-visited-interval 120)
+;; (auto-save-visited-mode +1)
 #+END_SRC
+
+** Super Save
+#+begin_src emacs-lisp
+(use-package! super-save
+  :config
+  (super-save-mode +1))
+#+end_src
 
 ** Always indent with spaces
 Never use tabs. Tabs are the devil’s whitespace.
