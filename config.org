@@ -882,7 +882,7 @@ CLOSED: [2020-02-26 Wed 03:48]
 
 * Easy-hugo
 #+BEGIN_SRC emacs-lisp
-(use-package easy-hugo
+(use-package! easy-hugo
   :init
   ;; Main blog
   (setq easy-hugo-basedir "~/Dropbox/git/github/hugo-blog/")
@@ -903,7 +903,10 @@ CLOSED: [2020-02-26 Wed 03:48]
           ;;  (easy-hugo-url . "https://yourproject.firebaseapp.com"))
 
           ))
-  :bind ("C-c C-e" . easy-hugo))
+  ;:bind ("C-c C-e" . easy-hugo)
+  )
+(define-key global-map "\C-c \C-e" nil)
+(define-key mode-specific-map "\C-e" nil)
  #+END_SRC
 * TODO Git auto commit
 #+begin_src emacs-lisp

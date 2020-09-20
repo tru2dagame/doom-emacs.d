@@ -66,6 +66,7 @@
 (package! ob-tmux)
 (package! wgrep)
 (package! rg)
+(package! easy-hugo)
 ;;(package! undo-tree)
 (package! valign
   :recipe (:host github :repo "casouri/valign"
