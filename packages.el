@@ -68,6 +68,7 @@
 (package! rg)
 (package! easy-hugo)
 ;;(package! undo-tree)
+(package! sudoku)
 (package! valign
   :recipe (:host github :repo "casouri/valign"
            :files ("valign.el" ))
