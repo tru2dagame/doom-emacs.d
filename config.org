@@ -1030,3 +1030,17 @@ https://chrome.google.com/webstore/detail/edit-with-emacs/ljobjlafonikaiipfkggjb
 #+begin_src emacs-lisp
 (setq magit-gitflow-popup-key "C-c m f")
 #+end_src
+* Graphql
+#+begin_src emacs-lisp
+(use-package! graphql-mode)
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! ob-graphql)
+#+end_src
+
+#+begin_src emacs-lisp
+;(use-package! company-graphql
+;  :config
+;  (add-to-list 'company-backends 'company-graphql))
+#+end_src
