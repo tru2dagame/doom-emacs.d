@@ -126,6 +126,9 @@
 #+begin_src emacs-lisp
 (after! centaur-tabs
   (centaur-tabs-group-by-projectile-project)
+  (define-key global-map "\C-q" nil)
+  (global-set-key (kbd "C-q C-h")  'centaur-tabs-backward)
+  (global-set-key (kbd "C-q C-l") 'centaur-tabs-forward)
 )
 #+end_src
 
