@@ -72,7 +72,7 @@
 (package! valign
   :recipe (:host github :repo "casouri/valign"
            :files ("valign.el" ))
-  :pin "6578fe45b143886a963646711cf579240333b4eb")
+  :pin "1d2ecd2afdb77021eaffc213d9fbbc6d9c38ed82")
 (package! yaml-mode)
 (package! super-save)
 (package! graphql-mode)
