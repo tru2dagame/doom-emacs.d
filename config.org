@@ -1228,6 +1228,68 @@ https://chrome.google.com/webstore/detail/edit-with-emacs/ljobjlafonikaiipfkggjb
 #+begin_src emacs-lisp
 (setq magit-gitflow-popup-key "C-c m f")
 #+end_src
+
+** TODO magit forge
+#+begin_src emacs-lisp
+(after! forge
+  (add-to-list 'forge-alist '("git.ubnt.com.cn" "git.ubnt.com.cn/api/v4" "git.ubnt.com.cn" forge-gitlab-repository))
+  (add-to-list 'forge-alist '("git.uidev.tools" "git.uidev.tools/api/v3" "git.uidev.tools" forge-github-repository))
+  (setq auth-sources '("~/.authinfo"))
+                                        ;(setq auth-sources '((:source "~/.authinfo")))
+  (setq ghub-use-workaround-for-emacs-bug nil)
+                                        ;(setq ghub-use-workaround-for-emacs-bug 'force)
+  (setq gitlab.user "tru")
+  (setq gitlab.host "git.ubnt.com.cn")
+  )
+(setq auth-sources '("~/.authinfo"))
+
+;; (use-package! ghub)
+;; (use-package! forge
+;;   :after magit
+;;   :config
+;;   (add-to-list 'forge-alist '("git.ubnt.com.cn" "git.ubnt.com.cn/api/v4" "git.ubnt.com.cn" forge-gitlab-repository))
+;;   (add-to-list 'forge-alist '("git.uidev.tools" "git.uidev.tools/api/v3" "git.uidev.tools" forge-github-repository))
+;;   (setq auth-sources '((:source "~/.authinfo")))
+;  (setq gitlab.user "tru")
+;  (setq gitlab.host "gitlab.git.ubnt.com.cn")
+
+  (setq ghub-use-workaround-for-emacs-bug nil) ;; fixies an issue where are workaround breaks gitlab
+  ;; https://github.com/magit/forge/issues/140
+  ;; (setq forge-topic-list-columns ;; get more details in the list of topics
+  ;;       '(("#" 5
+  ;;          (lambda (a b)
+  ;;            (> (car a) (car b)))
+  ;;          (:right-align t) number nil)
+  ;;         ("Title" 35 t nil title  nil)
+  ;;         ("Milestone" 4 t nil milestone nil)
+  ;;         ("State" 4 t nil state nil)
+  ;;         ("Updated" 10 t nill updated nil)
+  ;;         ))
+  (defun forge-create-secret-auth ()
+    "Prompts for and creates the git forge secret. Mostly for gitlab."
+    (interactive)
+    (let*
+        (
+         (repo (forge-get-repository 'full))
+         (host (oref repo apihost))
+         (username (ghub--username host  'gitlab))
+         (user (concat username "^forge"))
+         token
+         )
+      (setq token (read-passwd (format "Enter your token for %s @ %s: " username host)))
+      (ghub-clear-caches)
+      (auth-source-forget-all-cached)
+      (secrets-create-item
+       "Login" (format "%s @ %s" user host)
+       token
+       :host host
+       :user user
+       )
+      )
+    )
+;  )
+#+end_src
+
 * Graphql
 #+begin_src emacs-lisp
 (use-package! graphql-mode)
