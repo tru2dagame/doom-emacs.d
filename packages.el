@@ -81,6 +81,7 @@
   :recipe (:host github :repo "DarwinAwardWinner/mac-pseudo-daemon"
            :files ("mac-pseudo-daemon.el" ))
   :pin "564b006835facc4a8df247d8a47ab1030d7e7beb")
+;;(package! doom-modeline :pin "4956606a5455a3968ca10cbdb8de3889e6bd1d85")
 
 (package! w3m)
 (package! notmuch-labeler)
