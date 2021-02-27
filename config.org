@@ -269,7 +269,8 @@
 #+begin_src emacs-lisp
 (use-package! super-save
   :config
-  (super-save-mode +1))
+  (super-save-mode +1)
+  (setq super-save-auto-save-when-idle t))
 #+end_src
 
 ** Always indent with spaces
