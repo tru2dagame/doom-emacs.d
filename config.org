@@ -240,6 +240,13 @@
 (global-set-key (kbd "M-V") 'scroll-down)
 #+end_src
 
+** macOS Daemon
+#+begin_src emacs-lisp
+(when *is-a-mac*
+  (setq mac-pseudo-daemon-mode 't)
+  (mac-pseudo-daemon-mode 1))
+#+end_src
+
 ** Others
 #+begin_src emacs-lisp
 ;;(global-set-key (kbd "C-x C-b") 'ibuffer)
