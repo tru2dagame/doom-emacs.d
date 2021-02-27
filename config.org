@@ -165,6 +165,15 @@
   (ivy-posframe-mode 1))
 #+end_src
 
+** window
+#+begin_src emacs-lisp
+(global-set-key (kbd "M-s-<left>") 'shrink-window-horizontally)
+(global-set-key (kbd "M-s-<right>") 'enlarge-window-horizontally)
+(global-set-key (kbd "M-s-<down>") 'shrink-window)
+(global-set-key (kbd "M-s-<up>") 'enlarge-window)
+(setq window-safe-min-height 18)
+#+end_src
+
 * Frame size
 [[https://www.reddit.com/r/emacs/comments/9c0a4d/tip_setting_initial_frame_size_and_position/][Tip: Setting initial frame size and position : emacs]]
 #+begin_src emacs-lisp
