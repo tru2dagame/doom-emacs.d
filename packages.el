@@ -82,5 +82,6 @@
            :files ("mac-pseudo-daemon.el" ))
   :pin "564b006835facc4a8df247d8a47ab1030d7e7beb")
 
+(package! notmuch-labeler)
 
 ;;; $DOOMDIR/packages.el end

@@ -167,8 +167,8 @@
        web               ; the tubes
 
        :email
-       ;;(mu4e +gmail)
-       ;;notmuch
+       ;;(mu4e +org +gmail)
+       notmuch
        ;;(wanderlust +gmail)
 
        :app

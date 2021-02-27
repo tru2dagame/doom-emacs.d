@@ -812,6 +812,161 @@ https://emacs-china.org/t/org-mode/13248
 ;;(defun org-display-inline-images (&optional include-linked refresh beg end))
 #+end_src
 
+* Email
+** +mu4e+
+#+begin_src emacs-lisp
+;; (require 'mu4e-contrib)
+;; (setq mu4e-html2text-command 'mu4e-shr2text)
+;; (setq mu4e-html2text-command "iconv -c -t utf-8 | pandoc -f html -t plain")
+;; (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+#+end_src
+
+** notmuch
+#+begin_src emacs-lisp
+(defun get-string-from-file (filePath)
+  "Return filePath's file content."
+  (with-temp-buffer
+    (insert-file-contents filePath)
+    (buffer-string)))
+
+(fset '+notmuch-view-in-mailapp
+   (kmacro-lambda-form [?\M-x ?n ?o ?t ?m ?u ?c ?h ?- ?s ?h ?o ?w ?- ?s ?t ?a ?s ?h ?- ?m ?e ?s ?s ?a ?g ?e ?- ?i ?d ?- ?s ?t ?r ?\C-m ?\C-\[ ?! ?o ?p ?e ?n ?  ?m ?e ?s ?s ?a ?g ?e ?: ?/ ?/ ?% ?3 ?C ?\C-y ?% ?3 ?E ?\C-  ?\C-a ?\M-w ?\C-m] 0 "%d"))
+
+(fset '+notmuch-view-in-gmail
+   (kmacro-lambda-form [?c ?F ?\M-x ?u ?r ?l ?  ?m ?a ?c ?o ?s ?x return ?j ?j ?\C-  ?\C-a ?\C-d ?\C-y ?j ?j ?j ?\C-\M-b ?\C-\M-b ?\C-\M-b ?\C-\M-f ?\M-b ?\C-  ?\C-a ?\C-d ?\M-f ?\C-k ?\C-a ?h ?t ?t ?p ?s ?: ?/ ?/ ?m ?a ?i ?l ?. ?g ?o ?o ?g ?l ?e ?. ?c ?o ?m ?/ ?m ?a ?i ?l ?? ?# ?a ?l ?l ?/ ?\C-e return] 0 "%d"))
+#+end_src
+
+#+begin_src emacs-lisp
+(mm-display-parts (mm-dissect-buffer))
+#+end_src
+
+#+begin_src emacs-lisp
+;; workaround multi database
+(when (string-match "work" (get-string-from-file "/Users/tru/Dropbox/Apps/org-agenda/.git/HEAD"))
+  (setenv "NOTMUCH_CONFIG" "/Users/tru/Dropbox/Apps/emacs/tru/notmuchmail/ubiquiti/notmuch.conf")
+  (setq +notmuch-mail-folder "~/Dropbox/Apps/emacs/tru/notmuchmail/ubiquiti"))
+(when (string-match "life" (get-string-from-file "/Users/tru/Dropbox/Apps/org-agenda/.git/HEAD"))
+  (setenv "NOTMUCH_CONFIG" "/Users/tru/Dropbox/Apps/emacs/tru/notmuchmail/tru.zhou/notmuch.conf")
+  (setq +notmuch-mail-folder "~/Dropbox/Apps/emacs/tru/notmuchmail/tru.zhou"))
+
+(after! notmuch
+  (setq mm-text-html-renderer 'w3m)
+  (setq w3m-fill-column 72)
+  (setq w3m-default-display-inline-images t)
+  (setq notmuch-message-headers-visible t)
+  (setq notmuch-saved-searches
+        '((:name "inbox"      :query "tag:inbox"                    :count-query "tag:inbox and tag:unread"                    :key "i")
+          (:name "personal"   :query "tag:inbox and tag:personal"   :count-query "tag:inbox and tag:unread and tag:personal"   :key "p")
+          (:name "social"     :query "tag:inbox and tag:social"     :count-query "tag:inbox and tag:unread and tag:social"     :key "o")
+          (:name "promotions" :query "tag:inbox and tag:promotions" :count-query "tag:inbox and tag:unread and tag:promotions" :key "r")
+          (:name "updates"    :query "tag:inbox and tag:updates"    :count-query "tag:inbox and tag:unread and tag:updates"    :key "u")
+          (:name "forums"     :query "tag:inbox and tag:forums"     :count-query "tag:inbox and tag:unread and tag:forums"     :key "f")
+
+          (:name "flagged" :query "tag:flagged" :key "s")
+          (:name "sent"    :query "tag:sent"    :key "e")
+          (:name "drafts"  :query "tag:draft"   :key "d")))
+  (defun =notmuch ()
+    "Activate (or switch to) `notmuch' in its workspace."
+    (interactive)
+
+    ;; workaround multi database
+    (when (string-match "work" (get-string-from-file "/Users/tru/Dropbox/Apps/org-agenda/.git/HEAD"))
+      (setenv "NOTMUCH_CONFIG" "/Users/tru/Dropbox/Apps/emacs/tru/notmuchmail/ubiquiti/notmuch.conf")
+      (setq +notmuch-mail-folder "~/Dropbox/Apps/emacs/tru/notmuchmail/ubiquiti"))
+    (when (string-match "life" (get-string-from-file "/Users/tru/Dropbox/Apps/org-agenda/.git/HEAD"))
+      (setenv "NOTMUCH_CONFIG" "/Users/tru/Dropbox/Apps/emacs/tru/notmuchmail/tru.zhou/notmuch.conf")
+      (setq +notmuch-mail-folder "~/Dropbox/Apps/emacs/tru/notmuchmail/tru.zhou"))
+    (unless (featurep! :ui workspaces)
+      (user-error ":ui workspaces is required, but disabled"))
+    (condition-case-unless-debug e
+        (progn
+          (+workspace-switch "*MAIL*" t)
+          (if-let* ((buf (cl-find-if (lambda (it) (string-match-p "^\\*notmuch" (buffer-name (window-buffer it))))
+                                     (doom-visible-windows))))
+              (select-window (get-buffer-window buf))
+            (notmuch-search "tag:inbox and tag:unread"))
+          (+workspace/display))
+      ('error
+       (+notmuch/quit)
+       (signal (car e) (cdr e)))))
+
+  (define-key notmuch-show-mode-map (kbd ". m") #'+notmuch-view-in-mailapp)
+  (define-key notmuch-show-mode-map (kbd ". g") #'+notmuch-view-in-gmail)
+
+  (defun tru/notmuch/update ()
+    (interactive)
+    ;; create output buffer and jump to beginning
+    (let ((buf (get-buffer-create "*notmuch update*")))
+      (with-current-buffer buf
+        (erase-buffer))
+      (pop-to-buffer buf nil t)
+      (set-process-sentinel
+       (start-process-shell-command
+        "notmuch update" buf
+        (pcase +notmuch-sync-backend
+          (`gmi
+           ;&& export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib/
+           (setenv "DYLD_FALLBACK_LIBRARY_PATH" "")
+           (concat "cd " +notmuch-mail-folder " && export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib:/usr/local/lib/ && gmi sync && gmi sync"))
+          (`custom +notmuch-sync-command)))
+       ;; refresh notmuch buffers if sync was successful
+       (lambda (_process event)
+         (if (string= event "finished\n")
+             (notmuch-refresh-all-buffers))))))
+
+  (map! :localleader
+        :map (notmuch-search-mode-map notmuch-tree-mode-map notmuch-show-mode-map)
+        ;; :desc "Compose email"   "c" #'+notmuch/compose
+        :desc "Sync email" "u" #'tru/notmuch/update
+        ;; :desc "Quit notmuch"    "q" #'+notmuch/quit
+        ;; :map notmuch-search-mode-map
+        ;; :desc "Mark as deleted" "d" #'+notmuch/search-delete
+        ;; :desc "Mark as spam"    "s" #'+notmuch/search-spam
+        ;; :map notmuch-tree-mode-map
+        ;; :desc "Mark as deleted" "d" #'+notmuch/tree-delete
+        ;; :desc "Mark as spam"    "s" #'+notmuch/tree-spam
+        )
+  )
+#+end_src
+
+#+begin_src emacs-lisp
+;; (use-package! notmuch-labeler
+;;   :commands notmuch-labeler-rename
+;;   :after notmuch
+;;   :defer nil
+;;   :config
+;;   (notmuch-labeler-rename "unread" "new" ':foreground "blue"))
+
+;; Inline images?
+(setq mm-attachment-override-types '("image/.*"))
+;; Or, like this:
+(add-to-list 'mm-attachment-override-types "image/.*")
+(setq w3m-default-display-inline-images t)
+
+(defun notmuch-view-html ()
+  "Open the HTML parts of a mail in a web browser."
+  (interactive)
+  (with-current-notmuch-show-message
+   (let ((mm-handle (mm-dissect-buffer)))
+     (notmuch-foreach-mime-part
+      (lambda (p)
+        (if (string-equal (mm-handle-media-type p) "text/html")
+            (mm-display-external p (lambda ()
+                                     (message "Opening web browser...")
+                                     (browse-url-of-buffer)
+                                     (bury-buffer)))))
+      mm-handle))))
+#+end_src
+
+#+begin_src emacs-lisp
+(defun tru/notmuch-show-toggle-message ()
+  (interactive)
+  (let ((url (thing-at-point 'url 'no-properties)))
+    (if url
+      (goto-address-at-point)
+      (notmuch-show-toggle-message))))
+#+end_src
+
 * Deft
 #+begin_src emacs-lisp
 (setq deft-directory "~/Dropbox/Org")
