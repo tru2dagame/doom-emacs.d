@@ -128,12 +128,25 @@
 
 ** Tabs
 #+begin_src emacs-lisp
-(after! centaur-tabs
-  (centaur-tabs-group-by-projectile-project)
-  (define-key global-map "\C-q" nil)
-  (global-set-key (kbd "C-q C-h")  'centaur-tabs-backward)
-  (global-set-key (kbd "C-q C-l") 'centaur-tabs-forward)
-)
+;; (after! centaur-tabs
+;;   (centaur-tabs-group-by-projectile-project)
+;;   (define-key global-map "\C-q" nil)
+;;   (global-set-key (kbd "C-q C-h") 'centaur-tabs-backward)
+;;   (global-set-key (kbd "C-q C-l") 'centaur-tabs-forward)
+;; )
+#+end_src
+
+#+begin_src emacs-lisp
+(define-key global-map (kbd "C-q") (make-sparse-keymap))
+(global-tab-line-mode 1)
+;global-map <C-tab>
+(define-key global-map (kbd "C-<tab>") nil)
+(global-set-key (kbd "C-<tab>") 'tab-line-switch-to-prev-tab)
+(global-set-key (kbd "C-S-<tab>") 'tab-line-switch-to-next-tab)
+(tab-bar-mode 1)
+(global-set-key (kbd "ESC C-<tab>") 'tab-bar-switch-to-prev-tab)
+(global-set-key (kbd "ESC C-S-<tab>") 'tab-bar-switch-to-next-tab)
+(global-set-key (kbd "C-q C-q RET") 'tab-bar-select-tab-by-name)
 #+end_src
 
 ** ivy-postframe
