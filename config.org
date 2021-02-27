@@ -206,11 +206,6 @@
 (setq-default fill-column 2000)
 #+end_src
 
-* Define const =is-a-mac=
-#+begin_src emacs-lisp
-(defconst *is-a-mac* (eq system-type 'darwin))
-#+end_src
-
 * Quickly visit Emacs configuration
 #+BEGIN_SRC emacs-lisp
 (defun tru/visit-emacs-config ()
@@ -219,8 +214,13 @@
 (global-set-key (kbd "ESC ESC e") 'tru/visit-emacs-config)
 #+END_SRC
 
-* keybinding
-** macOS
+* macOS
+** Define const =is-a-mac=
+#+begin_src emacs-lisp
+(defconst *is-a-mac* (eq system-type 'darwin))
+#+end_src
+
+** keybinding
 #+begin_src emacs-lisp
 (when *is-a-mac*
   (setq mac-command-modifier 'meta)
