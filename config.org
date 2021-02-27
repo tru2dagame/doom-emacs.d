@@ -191,8 +191,13 @@
 #+end_src
 
 #+begin_src emacs-lisp
+(add-to-list 'default-frame-alist '(top . 10))
+(add-to-list 'default-frame-alist '(left . 81))
+
 (add-to-list 'default-frame-alist '(height . 53))
 (add-to-list 'default-frame-alist '(width . 153))
+;(add-to-list 'default-frame-alist '(top . 10))
+;(add-to-list 'default-frame-alist '(top . 81))
 #+end_src
 
 * Fill-column
