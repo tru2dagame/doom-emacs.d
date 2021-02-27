@@ -165,6 +165,10 @@
   (ivy-posframe-mode 1))
 #+end_src
 
+** TODO Tag everywhere
+https://gist.github.com/rougier/f0f291f681cb5b95aef5ad51a83166fd
+https://www.reddit.com/r/emacs/comments/jc4uou/tags_everywhere/
+
 ** window
 #+begin_src emacs-lisp
 (global-set-key (kbd "M-s-<left>") 'shrink-window-horizontally)
