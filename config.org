@@ -1024,7 +1024,9 @@ CLOSED: [2020-02-26 Wed 03:48]
 #+begin_src emacs-lisp
 (after! vterm
    (define-key vterm-mode-map (kbd "M-v")                #'vterm-yank)
-   (define-key vterm-mode-map [remap whole-line-or-region-yank]                #'vterm-yank)
+   ;;(define-key vterm-mode-map [remap whole-line-or-region-yank]                #'vterm-yank)
+   (define-key vterm-mode-map (kbd "C-h") nil)
+   (define-key vterm-mode-map (kbd "C-h") #'vterm-send-C-h)
    (setq vterm-max-scrollback 20000)
 )
 #+end_src
