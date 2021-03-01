@@ -143,8 +143,8 @@
 (global-tab-line-mode 1)
 ;global-map <C-tab>
 (define-key global-map (kbd "C-<tab>") nil)
-(global-set-key (kbd "C-<tab>") 'tab-line-switch-to-prev-tab)
-(global-set-key (kbd "C-S-<tab>") 'tab-line-switch-to-next-tab)
+(global-set-key (kbd "C-<tab>") 'tab-line-switch-to-next-tab)
+(global-set-key (kbd "C-S-<tab>") 'tab-line-switch-to-prev-tab)
 (tab-bar-mode 1)
 (global-set-key (kbd "ESC C-<tab>") 'tab-bar-switch-to-prev-tab)
 (global-set-key (kbd "ESC C-S-<tab>") 'tab-bar-switch-to-next-tab)
