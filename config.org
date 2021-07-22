@@ -332,6 +332,10 @@ https://www.reddit.com/r/emacs/comments/jc4uou/tags_everywhere/
 (global-set-key (kbd "ESC ESC e") 'tru/visit-emacs-config)
 #+END_SRC
 
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "ESC ESC ESC") 'doom/switch-to-scratch-buffer)
+#+END_SRC
+
 * macOS
 ** Define const =is-a-mac=
 #+begin_src emacs-lisp
