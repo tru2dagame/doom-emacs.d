@@ -456,6 +456,16 @@ Never use tabs. Tabs are the devil’s whitespace.
 )
 #+end_src
 
+** tramp
+#+begin_src emacs-lisp
+(setq tramp-shell-prompt-pattern "^[^$>\n]*[#$%>] *\\(\[[0-9;]*[a-zA-Z] *\\)*")
+#+end_src
+
+** rg
+#+begin_src emacs-lisp
+(setq counsel-rg-base-command '("rg" "-C" "2" "--max-columns" "240" "--with-filename" "--no-heading" "--line-number" "--color" "never" "%s"))
+#+end_src
+
 * isearch enhancements
 #+begin_src emacs-lisp
 (setq search-whitespace-regexp ".*?")
