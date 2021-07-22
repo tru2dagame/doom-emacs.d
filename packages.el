@@ -59,7 +59,7 @@
 (package! helm-org-rifle)
 (package! nyan-mode)
 (package! edit-server)
-(package! whitespace-cleanup-mode)
+;(package! whitespace-cleanup-mode)
 (package! pinyinlib)
 (package! pinyin-search)
 (package! youdao-dictionary)
@@ -72,12 +72,12 @@
 (package! valign
   :recipe (:host github :repo "casouri/valign"
            :files ("valign.el" ))
-  :pin "1d2ecd2afdb77021eaffc213d9fbbc6d9c38ed82")
+  :pin "421c8c0cb4636e5fd87ac1022d6b8268c320f74f")
 (package! yaml-mode)
 (package! super-save)
 (package! graphql-mode)
 (package! ob-graphql)
-(package! mac-pseudo-daemon
+ (package! mac-pseudo-daemon
   :recipe (:host github :repo "DarwinAwardWinner/mac-pseudo-daemon"
            :files ("mac-pseudo-daemon.el" ))
   :pin "564b006835facc4a8df247d8a47ab1030d7e7beb")
@@ -85,5 +85,22 @@
 
 (package! w3m)
 (package! notmuch-labeler)
+(package! org-tree-slide)
+(package! org-present)
+(package! osx-dictionary)
+(package! popper
+  :recipe (:host github :repo "karthink/popper"
+           :files ("popper.el")))
+(package! org-kanban)
+
+;; eaf
+(package! eaf
+  :recipe (:host github :repo "manateelazycat/emacs-application-framework"
+           :files ("eaf.el")))
+(package! epc)
+(package! ctable)
+(package! deferred)
+(package! s)
+;; end eaf
 
 ;;; $DOOMDIR/packages.el end
