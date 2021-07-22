@@ -383,6 +383,16 @@ https://www.reddit.com/r/emacs/comments/jc4uou/tags_everywhere/
 ;; (push "*osx-dictionary*" popwin:special-display-config)
 #+end_src
 
+** Quickly visit macOS configuration
+
+*** zshrc
+#+begin_src emacs-lisp
+(defun tru/visit-custom-dotzshrc ()
+  (interactive)
+  (find-file "/Users/tru/Dropbox/Dev/configs/zshrc.d/README.org"))
+(global-set-key (kbd "ESC ESC z") 'tru/visit-custom-dotzshrc)
+#+end_src
+
 * Editing
 ** sudo edit
 #+BEGIN_SRC emacs-lisp
