@@ -737,16 +737,20 @@ https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/
 
 ** Visit daily org file
 
-   #+BEGIN_SRC emacs-lisp
-     (defun tru/visit-my-org-daily ()
-       (interactive)
-       (find-file "~/Dropbox/Org/daily.org"))
-     (global-set-key (kbd "ESC ESC d") 'tru/visit-my-org-daily)
-     (defun tru/visit-my-org-inbox ()
-       (interactive)
-       (find-file "~/Dropbox/Org/inbox.org"))
-     (global-set-key (kbd "ESC ESC i") 'tru/visit-my-org-inbox)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+(defun tru/visit-my-org-daily ()
+  (interactive)
+  (find-file "~/Dropbox/Org/daily.org"))
+(global-set-key (kbd "ESC ESC d") 'tru/visit-my-org-daily)
+(defun tru/visit-my-org-inbox ()
+  (interactive)
+  (find-file "~/Dropbox/Org/inbox.org"))
+(global-set-key (kbd "ESC ESC i") 'tru/visit-my-org-inbox)
+(defun tru/visit-my-org-journal ()
+  (interactive)
+  (find-file "~/Dropbox/Org/journal.org"))
+(global-set-key (kbd "ESC ESC j") 'tru/visit-my-org-journal)
+#+END_SRC
 
 ** Org ansi
 #+begin_src emacs-lisp
