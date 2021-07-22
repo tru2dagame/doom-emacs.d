@@ -523,7 +523,7 @@ This function is meant to be mapped to a key in `rg-mode-map'."
   :bind-keymap ("ESC ESC 1" . google-this-mode-submap))
 #+END_SRC
 
-* Org :org:
+* Org                                                                           :org:
 ** Org settings from purcell
 #+begin_src emacs-lisp
 (after! org
@@ -665,9 +665,12 @@ https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/
                    "* TODO %?\n%U\n" :clock-resume t)
                   ("1n" "note" entry (file "~/Dropbox/Org/notes.org")
                    "* %? :NOTE:\n%U\n%a\n" :clock-resume t)
-                  )org-capture-templates))
+        )
+        org-capture-templates))
 )
 #+end_src
+
+
 ** org-mode automatically wrap lines
 #+begin_src emacs-lisp
 (after! org
