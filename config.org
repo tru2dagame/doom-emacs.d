@@ -265,10 +265,7 @@
 
 ** ivy-postframe
 #+begin_src emacs-lisp
-(use-package! ivy-posframe
-  :after ivy
-  :diminish
-  :config
+(after! ivy-posframe
   (setq ivy-posframe-display-functions-alist
         '((swiper          . ivy-posframe-display-at-point)
           (complete-symbol . ivy-posframe-display-at-point)
