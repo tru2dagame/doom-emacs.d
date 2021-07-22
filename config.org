@@ -1341,6 +1341,11 @@ https://chrome.google.com/webstore/detail/edit-with-emacs/ljobjlafonikaiipfkggjb
 
 * Magit
 
+** magit-status-here
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-x g") 'magit-status-here)
+#+end_src
+
 ** magit-gitflow
 #+begin_src emacs-lisp
 (setq magit-gitflow-popup-key "C-c m f")
