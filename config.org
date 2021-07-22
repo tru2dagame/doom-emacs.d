@@ -292,6 +292,11 @@ https://www.reddit.com/r/emacs/comments/jc4uou/tags_everywhere/
 (setq window-safe-min-height 18)
 #+end_src
 
+** Display Line Number
+#+begin_src emacs-lisp
+(setq display-line-numbers-type 'relative)
+#+end_src
+
 * Frame size
 [[https://www.reddit.com/r/emacs/comments/9c0a4d/tip_setting_initial_frame_size_and_position/][Tip: Setting initial frame size and position : emacs]]
 #+begin_src emacs-lisp
