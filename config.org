@@ -997,6 +997,13 @@ https://github.com/daviwil/dotfiles/blob/master/Emacs.org#presentations
   :hook ((org-present-mode . dw/org-present-hook)
          (org-present-mode-quit . dw/org-present-quit-hook)))
 #+end_src
+
+** Auto babel tangle
+#+begin_src emacs-lisp
+(after! org
+  (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t))
+#+end_src
+
 ** Org-toggle-emphasis
 https://stackoverflow.com/questions/10969617/hiding-markup-elements-in-org-mode
 
