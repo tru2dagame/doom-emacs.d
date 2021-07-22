@@ -393,6 +393,14 @@ https://www.reddit.com/r/emacs/comments/jc4uou/tags_everywhere/
 (global-set-key (kbd "ESC ESC z") 'tru/visit-custom-dotzshrc)
 #+end_src
 
+*** zsh custom functions
+#+begin_src emacs-lisp
+(defun tru/visit-custom-functions ()
+  (interactive)
+  (find-file "/Users/tru/Dropbox/git/src/git.uidev.tools/tru-zhou/get-started/README.org"))
+(global-set-key (kbd "ESC ESC f") 'tru/visit-custom-functions)
+#+end_src
+
 * Editing
 ** sudo edit
 #+BEGIN_SRC emacs-lisp
