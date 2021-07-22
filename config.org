@@ -147,20 +147,40 @@
   )
 #+end_src
 
-* Doom-modeline
+* UI
+** Doom-modeline
 #+begin_src emacs-lisp
 (after! doom-modeline
-  (setq doom-modeline-icon t
-        doom-modeline-major-mode-icon t
-        doom-modeline-major-mode-color-icon t
-        doom-modeline-buffer-state-icon t
-        doom-modeline-buffer-modification-icon t
-        doom-modeline-enable-word-count nil
-        doom-modeline-indent-info t)
-)
+  (doom-modeline-def-modeline 'my/modeline
+    '(bar matches buffer-info remote-host buffer-position parrot selection-info)
+    '(misc-info minor-modes checker input-method buffer-encoding major-mode process vcs))
+  (defun setup-custom-doom-modeline ()
+    (doom-modeline-set-modeline 'my/modeline 'default))
+  (add-hook 'doom-modeline-mode-hook 'setup-custom-doom-modeline))
+
+(custom-set-faces!
+  '(mode-line :height 180)
+  '(mode-line-inactive :height 180))
 #+end_src
 
-** [[http://sodaware.sdf.org/notes/emacs-daemon-doom-modeline-icons/][Enabling doom-modeline icons when using daemon mode - sodaware.sdf.org]]
+#+begin_src emacs-lisp
+;; (after! doom-modeline
+;;   (setq
+;;         doom-modeline-height 1
+;;         doom-modeline-icon t
+;;         doom-modeline-major-mode-icon t
+;;         doom-modeline-major-mode-color-icon t
+;;         doom-modeline-buffer-state-icon t
+;;         doom-modeline-buffer-modification-icon t
+;;         doom-modeline-enable-word-count nil
+;;         doom-modeline-indent-info t
+;;         doom-modeline-workspace-name t)
+;;   (set-face-attribute 'mode-line nil :height 180)
+;;   (set-face-attribute 'mode-line-inactive nil :height 180)
+;; )
+#+end_src
+
+*** [[http://sodaware.sdf.org/notes/emacs-daemon-doom-modeline-icons/][Enabling doom-modeline icons when using daemon mode - sodaware.sdf.org]]
 #+begin_src emacs-lisp
 ;; (defun enable-doom-modeline-icons (_frame)
 ;;   (setq doom-modeline-icon t))
