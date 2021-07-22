@@ -1,6 +1,6 @@
 #+TITLE: Config
 #+AUTHOR: Tru Zhou
-#+STARTUP: overview
+#+STARTUP: show2levels
 #+PROPERTY: header-args :comments yes :results silent
 
 * Contents                                                                      :TOC_5:
