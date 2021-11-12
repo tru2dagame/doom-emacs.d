@@ -72,7 +72,8 @@
        dired             ; making dired pretty [functional]
        electric          ; smarter, keyword-based electric-indent
        ibuffer           ; interactive buffer management
-       undo              ; persistent, smarter undo for your inevitable mistakes
+       (undo              ; persistent, smarter undo for your inevitable mistakes
+       +tree)
        vc                ; version-control and Emacs, sitting in a tree
 
        :term
@@ -99,13 +100,14 @@
         +docsets)        ; ...or in Dash docsets locally
        ;;lsp
        macos             ; MacOS-specific commands
-       magit             ; a git porcelain for Emacs
+       (magit             ; a git porcelain for Emacs
+        +forge)            ;
        make              ; run make tasks from Emacs
        (pass              ; password manager for nerds
         +auth)
        ;;pdf               ; pdf enhancements
        ;;prodigy           ; FIXME managing external services & code builders
-       ;;rgb               ; creating color strings
+       rgb               ; creating color strings
        terraform         ; infrastructure as code
        tmux              ; an API for interacting with tmux
        ;;upload            ; map local to remote projects via ssh/ftp

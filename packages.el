@@ -55,7 +55,7 @@
 (package! google-this)
 (package! git-auto-commit-mode)
 (package! grab-mac-link)
-(package! ivy-posframe)
+;(package! ivy-posframe)
 (package! helm-org-rifle)
 (package! nyan-mode)
 (package! edit-server)
@@ -67,7 +67,7 @@
 (package! wgrep)
 (package! rg)
 (package! easy-hugo)
-;;(package! undo-tree)
+;(package! undo-tree)
 (package! sudoku)
 (package! valign
   :recipe (:host github :repo "casouri/valign"

@@ -433,6 +433,9 @@ Never use tabs. Tabs are the devil’s whitespace.
 
 ** undo-tree
 #+begin_src emacs-lisp
+(after! undo-tree
+  (setq undo-tree-auto-save-history nil))
+
 ;; (use-package! undo-tree
 ;;   ;; Branching & persistent undo
 ;;   :after-call doom-switch-buffer-hook after-find-file
@@ -1498,14 +1501,12 @@ https://chrome.google.com/webstore/detail/edit-with-emacs/ljobjlafonikaiipfkggjb
 (after! forge
   (add-to-list 'forge-alist '("git.ubnt.com.cn" "git.ubnt.com.cn/api/v4" "git.ubnt.com.cn" forge-gitlab-repository))
   (add-to-list 'forge-alist '("git.uidev.tools" "git.uidev.tools/api/v3" "git.uidev.tools" forge-github-repository))
-  (setq auth-sources '("~/.authinfo"))
                                         ;(setq auth-sources '((:source "~/.authinfo")))
   (setq ghub-use-workaround-for-emacs-bug nil)
                                         ;(setq ghub-use-workaround-for-emacs-bug 'force)
   (setq gitlab.user "tru")
   (setq gitlab.host "git.ubnt.com.cn")
   )
-(setq auth-sources '("~/.authinfo"))
 
 ;; (use-package! ghub)
 ;; (use-package! forge
