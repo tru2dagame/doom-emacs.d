@@ -90,8 +90,9 @@
   - [[#magit-status-here][magit-status-here]]
   - [[#magit-gitflow][magit-gitflow]]
   - [[#magit-forge][magit forge]]
-- [[#graphql][Graphql]]
-- [[#eaf-emacs-application-framework][EAF emacs-application-framework]]
+- [[#git-blamer][git blamer]]
+- [[#hold-graphql][HOLD Graphql]]
+- [[#wait-eaf-emacs-application-framework][WAIT EAF emacs-application-framework]]
 
 * Doom default config
 #+begin_src emacs-lisp
@@ -156,9 +157,9 @@
     (doom-modeline-set-modeline 'my/modeline 'default))
   (add-hook 'doom-modeline-mode-hook 'setup-custom-doom-modeline))
 
-(custom-set-faces!
-  '(mode-line :height 180)
-  '(mode-line-inactive :height 180))
+;; (custom-set-faces!
+;;   '(mode-line :height 180)
+;;   '(mode-line-inactive :height 180))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -283,7 +284,7 @@ https://www.reddit.com/r/emacs/comments/jc4uou/tags_everywhere/
 (global-set-key (kbd "M-s-<right>") 'enlarge-window-horizontally)
 (global-set-key (kbd "M-s-<down>") 'shrink-window)
 (global-set-key (kbd "M-s-<up>") 'enlarge-window)
-(setq window-safe-min-height 18)
+;(setq window-safe-min-height 18)
 #+end_src
 
 ** Display Line Number
@@ -597,7 +598,7 @@ This function is meant to be mapped to a key in `rg-mode-map'."
 ;;       (quote (("NEXT" :inherit warning)
 ;;               ("PROJECT" :inherit font-lock-string-face))))
 
-(setq-default org-agenda-clockreport-parameter-plist '(:link t :maxlevel 3))
+(setq-default org-agenda-clockreport-parameter-plist '(:link t :maxlevel 4))
 
 
 ;; (let ((active-project-match "-INBOX/PROJECT"))
@@ -707,7 +708,6 @@ https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/
 )
 #+end_src
 
-
 ** org-mode automatically wrap lines
 #+begin_src emacs-lisp
 (after! org
@@ -803,8 +803,12 @@ https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/
 #+END_SRC
 
 ** Org ansi
-#+begin_src emacs-lisp
-(require 'cl)
+#+begin_src emacs-lisp :tangle no
+
+(require 'loadhist)
+;(file-dependents (feature-file 'cl))
+
+;(require 'cl-lib)
 (defun tru/org-redisplay-ansi-export-blocks ()
   "Refresh the display of ANSI text source blocks."
   (interactive)
@@ -1496,7 +1500,7 @@ https://chrome.google.com/webstore/detail/edit-with-emacs/ljobjlafonikaiipfkggjb
 (setq magit-gitflow-popup-key "C-c m f")
 #+end_src
 
-** TODO magit forge
+** magit forge
 #+begin_src emacs-lisp
 (after! forge
   (add-to-list 'forge-alist '("git.ubnt.com.cn" "git.ubnt.com.cn/api/v4" "git.ubnt.com.cn" forge-gitlab-repository))
@@ -1555,23 +1559,41 @@ https://chrome.google.com/webstore/detail/edit-with-emacs/ljobjlafonikaiipfkggjb
 ;  )
 #+end_src
 
-* Graphql
+* git blamer
+https://github.com/Artawower/blamer.el
+
 #+begin_src emacs-lisp
+(use-package blamer
+  :defer 20
+  :custom
+  (blamer-idle-time 0.5)
+  (blamer-min-offset 50)
+  (blamer-type 'both)
+  (blamer-max-lines 10)
+  (blamer-author-formatter " ✎ %s ")
+  (blamer-datetime-formatter "[%s]")
+  (blamer-commit-formatter "● %s")
+  :custom-face
+  (blamer-face ((t :foreground "#7a88cf"
+                   :background nil
+                   ;; :height 140
+                   :italic t
+                    )))
+  :config
+  (global-blamer-mode 1))
+#+end_src
+
+* HOLD Graphql
+#+begin_src emacs-lisp :tangle no
 (use-package! graphql-mode)
-#+end_src
-
-#+begin_src emacs-lisp
 (use-package! ob-graphql)
+(use-package! company-graphql
+ :config
+ (add-to-list 'company-backends 'company-graphql))
 #+end_src
 
-#+begin_src emacs-lisp
-;(use-package! company-graphql
-;  :config
-;  (add-to-list 'company-backends 'company-graphql))
-#+end_src
-
-* EAF emacs-application-framework
-#+begin_src emacs-lisp
+* WAIT EAF emacs-application-framework
+#+begin_src emacs-lisp :tangle no
 (use-package! eaf
   :load-path "/Users/tru/Dropbox/git/src/github.com/manateelazycat/emacs-application-framework"
   :init

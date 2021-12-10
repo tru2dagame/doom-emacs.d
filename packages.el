@@ -67,7 +67,12 @@
 (package! wgrep)
 (package! rg)
 (package! easy-hugo)
-;(package! undo-tree)
+
+;https://gitlab.com/tsc25/undo-tree/-/blob/release/0.8.1/undo-tree.el
+(package! undo-tree
+  :recipe (:host gitlab :repo "tsc25/undo-tree"
+           :files ("undo-tree.el" ))
+  :pin "594ed6a788c8a51ee97da071aac22ea0c12b43d4")
 (package! sudoku)
 (package! valign
   :recipe (:host github :repo "casouri/valign"
@@ -92,15 +97,17 @@
   :recipe (:host github :repo "karthink/popper"
            :files ("popper.el")))
 (package! org-kanban)
+(package! blamer :recipe (:host github :repo "artawower/blamer.el"))
+;(package! dash-at-point :recipe (:host github :repo "stanaka/dash-at-point"))
 
 ;; eaf
-(package! eaf
-  :recipe (:host github :repo "manateelazycat/emacs-application-framework"
-           :files ("eaf.el")))
-(package! epc)
-(package! ctable)
-(package! deferred)
-(package! s)
+;; (package! eaf
+;;   :recipe (:host github :repo "manateelazycat/emacs-application-framework"
+;;            :files ("eaf.el")))
+;; (package! epc)
+;; (package! ctable)
+;; (package! deferred)
+;; (package! s)
 ;; end eaf
 
 ;;; $DOOMDIR/packages.el end
