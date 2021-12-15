@@ -148,7 +148,7 @@
        ;;nix               ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
        (org              ; organize your plain life in plain text
-        ;;+roam            ;
+        +roam2            ;
         +dragndrop       ; drag & drop files/images into org buffers
         +hugo            ; use Emacs for hugo blogging
         ;;+jupyter        ; ipython/jupyter support for babel
@@ -156,7 +156,7 @@
         ;;+pomodoro        ; be fruitful with the tomato technique
         +present        ; using org-mode for presentations
         ;; +noter           ;Enables org-noter integration. Keeps notes in sync with a document. Requires pdf-tools (:tools pdf) or DocView or nov.el to be enabled.
-        ;; +journal         ;Enables org-journal integration
+        +journal         ;Enables org-journal integration
         )                 ; end org module
        ;;perl              ; write code no one else can comprehend
        php               ; perl's insecure younger brother
