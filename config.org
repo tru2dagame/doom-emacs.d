@@ -964,7 +964,7 @@ https://emacs-china.org/t/org-mode/13248
 ** Org-roam
 
 #+begin_src emacs-lisp
-(setq org-roam-directory "/Users/tru/Dropbox/Org/uid/")
+(setq org-roam-directory "/Users/tru/Dropbox/Org/org-roam/")
 #+end_src
 
 ** Org-mouse
