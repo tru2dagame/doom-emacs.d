@@ -1566,7 +1566,7 @@ https://github.com/Artawower/blamer.el
 (use-package blamer
   :defer 20
   :custom
-  (blamer-idle-time 0.5)
+  (blamer-idle-time 1.5)
   (blamer-min-offset 50)
   (blamer-type 'both)
   (blamer-max-lines 10)
