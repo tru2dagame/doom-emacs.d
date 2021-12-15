@@ -804,12 +804,11 @@ https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/
 #+END_SRC
 
 ** Org ansi
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp
 
-(require 'loadhist)
+;(require 'loadhist)
 ;(file-dependents (feature-file 'cl))
-
-;(require 'cl-lib)
+(require 'cl-lib)
 (defun tru/org-redisplay-ansi-export-blocks ()
   "Refresh the display of ANSI text source blocks."
   (interactive)
