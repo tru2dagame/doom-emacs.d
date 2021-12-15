@@ -734,19 +734,19 @@ https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/
      (defvar org-mac-context nil)
 
      ;;; Use org-mac to get link context and insert it to the captured item
-     (add-hook 'org-capture-prepare-finalize-hook
-               (lambda ()
-                 (when (equal
-                        (cdr (assoc 'name (frame-parameters (selected-frame))))
-                        "remember")
-                   (progn
-                     (goto-char (point-max))
-                     (if org-mac-context
-                         (progn
-                           (insert (concat org-mac-context "\n"))
-                           (setq org-mac-context nil))
-                       nil)
-                     (call-interactively 'org-mac-grab-link)))))
+     ;; (add-hook 'org-capture-prepare-finalize-hook
+     ;;           (lambda ()
+     ;;             (when (equal
+     ;;                    (cdr (assoc 'name (frame-parameters (selected-frame))))
+     ;;                    "remember")
+     ;;               (progn
+     ;;                 (goto-char (point-max))
+     ;;                 (if org-mac-context
+     ;;                     (progn
+     ;;                       (insert (concat org-mac-context "\n"))
+     ;;                       (setq org-mac-context nil))
+     ;;                   nil)
+     ;;                 (call-interactively 'org-mac-grab-link)))))
 
      ;;; Delete frame when capture is done
      (add-hook 'org-capture-after-finalize-hook
