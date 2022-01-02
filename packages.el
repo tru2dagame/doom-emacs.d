@@ -99,6 +99,7 @@
 (package! org-kanban)
 (package! blamer :recipe (:host github :repo "artawower/blamer.el"))
 ;(package! dash-at-point :recipe (:host github :repo "stanaka/dash-at-point"))
+(package! screenshot :recipe (:host github :repo "tecosaur/screenshot"))
 
 (package! silicon :recipe (:host github :repo "iensu/silicon-el"))
 ;; eaf

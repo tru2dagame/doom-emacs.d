@@ -92,6 +92,7 @@
   - [[#magit-forge][magit forge]]
 - [[#git-blamer][git blamer]]
 - [[#silicon-el][silicon-el]]
+- [[#hold-screenshot][HOLD screenshot]]
 - [[#hold-graphql][HOLD Graphql]]
 - [[#wait-eaf-emacs-application-framework][WAIT EAF emacs-application-framework]]
 
@@ -1588,6 +1589,15 @@ https://github.com/Artawower/blamer.el
 https://github.com/iensu/silicon-el
 #+begin_src emacs-lisp
 (use-package! silicon)
+#+end_src
+
+* HOLD screenshot
+https://github.com/tecosaur/screenshot/issues/13
+ERROR: insert: Symbol’s function definition is void: x-export-frames
+
+#+begin_src emacs-lisp :tangle no
+(use-package! screenshot)
+(load-file (locate-library "screenshot.el"))
 #+end_src
 
 * HOLD Graphql
