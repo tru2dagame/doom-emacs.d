@@ -3,3 +3,4 @@
 .gnupg
 config.el
 flycheck_init.elc
+.local
