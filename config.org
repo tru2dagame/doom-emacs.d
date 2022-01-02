@@ -91,6 +91,7 @@
   - [[#magit-gitflow][magit-gitflow]]
   - [[#magit-forge][magit forge]]
 - [[#git-blamer][git blamer]]
+- [[#silicon-el][silicon-el]]
 - [[#hold-graphql][HOLD Graphql]]
 - [[#wait-eaf-emacs-application-framework][WAIT EAF emacs-application-framework]]
 
@@ -1581,6 +1582,12 @@ https://github.com/Artawower/blamer.el
                     )))
   :config
   (global-blamer-mode 1))
+#+end_src
+
+* silicon-el
+https://github.com/iensu/silicon-el
+#+begin_src emacs-lisp
+(use-package! silicon)
 #+end_src
 
 * HOLD Graphql
