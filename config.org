@@ -126,7 +126,8 @@
 ;; (setq doom-font (font-spec :family "Operator Mono SSm" :size 20))
 ;;(set-face-attribute 'default nil :family "Operator Mono SSm Lig" :weight 'normal)
 ;(setq doom-font (font-spec :family "Operator Mono SSm Lig" :weight 'normal :size 20))
-(setq doom-font (font-spec :family "MesloLGS NF" :weight 'normal :size 20))
+(setq doom-font (font-spec :family "MesloLGS NF" :weight 'normal :size 20)
+      doom-variable-pitch-font (font-spec :family "MesloLGS NF" :size 20))
 (setq doom-unicode-font doom-font)
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
