@@ -14,7 +14,9 @@
              (if
                  (y-or-n-p "Tangle?")
                  (org-babel-tangle)))
-           nil t))))
+           nil t)))
+ '(emacs-everywhere-frame-parameters '((name . "emacs-everywhere") (width . 120) (height . 40)))
+ )
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
