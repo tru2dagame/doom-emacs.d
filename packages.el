@@ -102,6 +102,14 @@
 (package! screenshot :recipe (:host github :repo "tecosaur/screenshot"))
 
 (package! silicon :recipe (:host github :repo "iensu/silicon-el"))
+(package! org-roam-ui)
+(package! org-bars :recipe (:host github :repo "tonyaldon/org-bars" :files ("org-bars.el")))
+(when IS-MAC
+  (package! org-mac-link :recipe (:host github :repo "emacsmirror/org-mac-link"))
+  (package! org-mac-iCal :recipe (:host github :repo "ndw/org-mac-iCal"))
+)
+(package! denote :recipe (:host github :repo "protesilaos/denote"))
+
 ;; eaf
 ;; (package! eaf
 ;;   :recipe (:host github :repo "manateelazycat/emacs-application-framework"

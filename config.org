@@ -35,6 +35,7 @@
   - [[#quickly-visit-macos-configuration][Quickly visit macOS configuration]]
     - [[#zshrc][zshrc]]
     - [[#zsh-custom-functions][zsh custom functions]]
+  - [[#org-mac-icalel--import-mac-os-x-icalapp-events-into-emacs-diary][org-mac-iCal.el – import Mac OS X iCal.app events into Emacs diary]]
 - [[#editing][Editing]]
   - [[#sudo-edit][sudo edit]]
   - [[#auto-save][Auto Save]]
@@ -44,6 +45,9 @@
   - [[#undo][undo]]
   - [[#tramp][tramp]]
   - [[#rg][rg]]
+  - [[#avy-goto-char-2][avy-goto-char-2]]
+  - [[#better-jump][better-jump]]
+  - [[#mark-ring][mark ring]]
 - [[#isearch-enhancements][isearch enhancements]]
 - [[#rg-1][RG]]
 - [[#google-it][Google it]]
@@ -53,6 +57,7 @@
   - [[#org-mode-automatically-wrap-lines][org-mode automatically wrap lines]]
   - [[#org-note-file][Org note file]]
   - [[#org-agenda-file][Org Agenda File]]
+  - [[#org-refile-targets][org refile targets]]
   - [[#org-capture-for-alfred][Org Capture for alfred]]
   - [[#visit-daily-org-file][Visit daily org file]]
   - [[#org-ansi][Org ansi]]
@@ -65,11 +70,15 @@
   - [[#org-debug][Org debug]]
   - [[#org-table-valign][Org table valign]]
   - [[#org-roam][Org-roam]]
+    - [[#org-roam-ui][org-roam-ui]]
   - [[#org-mouse][Org-mouse]]
   - [[#org-display-a-single-inline-image][Org display a single inline image]]
   - [[#org-presentation][Org presentation]]
   - [[#auto-babel-tangle][Auto babel tangle]]
   - [[#org-toggle-emphasis][Org-toggle-emphasis]]
+  - [[#org-bars][org-bars]]
+  - [[#org-mac-link][org-mac-link]]
+- [[#denote][Denote]]
 - [[#email][Email]]
   - [[#mu4e][+mu4e+]]
   - [[#notmuch][notmuch]]
@@ -312,7 +321,6 @@
 ;; (add-hook 'after-make-frame-functions
 ;;           #'enable-doom-modeline-icons)
 #+end_src
-
 ** Whitespace
 #+begin_src emacs-lisp
 ;; (ws-butler-global-mode -1)
@@ -412,6 +420,14 @@ https://www.reddit.com/r/emacs/comments/jc4uou/tags_everywhere/
 (global-set-key (kbd "M-s-<down>") 'shrink-window)
 (global-set-key (kbd "M-s-<up>") 'enlarge-window)
 ;(setq window-safe-min-height 18)
+#+end_src
+
+helm window size
+
+#+begin_src emacs-lisp
+(setq helm-autoresize-max-height 50)
+(setq helm-autoresize-min-height 45)
+;(helm-autoresize-mode 1)
 #+end_src
 
 ** Display Line Number
@@ -528,8 +544,19 @@ https://www.reddit.com/r/emacs/comments/jc4uou/tags_everywhere/
 #+begin_src emacs-lisp
 (defun tru/visit-custom-functions ()
   (interactive)
-  (find-file "/Users/tru/Dropbox/git/src/git.uidev.tools/tru-zhou/get-started/README.org"))
+  (find-file "/Users/tru/Dropbox/git/src/github.com/Ubiquiti-UID/uid.literate-devops/README.org"))
 (global-set-key (kbd "ESC ESC f") 'tru/visit-custom-functions)
+#+end_src
+
+** org-mac-iCal.el – import Mac OS X iCal.app events into Emacs diary
+https://orgmode.org/worg/org-contrib/org-mac-iCal.html
+https://github.com/ndw/org-mac-iCal
+#+begin_src emacs-lisp
+;; #(use-package! org-mac-iCal)
+(load-file "/Users/tru/Dropbox/git/src/github.com/tru2dagame/org-mac-iCal/org-mac-iCal.el")
+;; (load-file (locate-library "org-mac-iCal.el"))
+(add-to-list 'org-modules 'org-mac-iCal)
+(setq org-agenda-include-diary t)
 #+end_src
 
 * Editing
@@ -543,6 +570,7 @@ https://www.reddit.com/r/emacs/comments/jc4uou/tags_everywhere/
 (setq auto-save-visited-file-name t)
 (setq auto-save-visited-interval 600)
 (auto-save-visited-mode +1)
+(setq buffer-save-without-query 't)
 #+END_SRC
 
 ** Super Save
@@ -562,63 +590,22 @@ Never use tabs. Tabs are the devil’s whitespace.
 ** undo-tree
 #+begin_src emacs-lisp
 (after! undo-tree
-  (setq undo-tree-auto-save-history nil))
-
-;; (use-package! undo-tree
-;;   ;; Branching & persistent undo
-;;   :after-call doom-switch-buffer-hook after-find-file
-;;   :config
-;;   (setq undo-tree-visualizer-diff t
-;;         undo-tree-auto-save-history t
-;;         undo-tree-enable-undo-in-region t
-;;         ;; Increase undo-limits by a factor of ten to avoid emacs prematurely
-;;         ;; truncating the undo history and corrupting the tree. See
-;;         ;; https://github.com/syl20bnr/spacemacs/issues/12110
-;;         undo-limit 800000
-;;         undo-strong-limit 12000000
-;;         undo-outer-limit 120000000
-;;         undo-tree-history-directory-alist
-;;         `(("." . ,(concat doom-cache-dir "undo-tree-hist/"))))
-
-;;   ;; Compress undo-tree history files with zstd, if available. File size isn't
-;;   ;; the (only) concern here: the file IO barrier is slow for Emacs to cross;
-;;   ;; reading a tiny file and piping it in-memory through zstd is *slightly*
-;;   ;; faster than Emacs reading the entire undo-tree file from the get go (on
-;;   ;; SSDs). Whether or not that's true in practice, we still enjoy zstd's ~80%
-;;   ;; file savings (these files add up over time and zstd is so incredibly fast).
-;;   (when (executable-find "zstd")
-;;     (defadvice! doom--undo-tree-make-history-save-file-name-a (file)
-;;       :filter-return #'undo-tree-make-history-save-file-name
-;;       (concat file ".zst")))
-
-;;   ;; Strip text properties from undo-tree data to stave off bloat. File size
-;;   ;; isn't the concern here; undo cache files bloat easily, which can cause
-;;   ;; freezing, crashes, GC-induced stuttering or delays when opening files.
-;;   (defadvice! doom--undo-tree-strip-text-properties-a (&rest _)
-;;     :before #'undo-list-transfer-to-tree
-;;     (dolist (item buffer-undo-list)
-;;       (and (consp item)
-;;            (stringp (car item))
-;;            (setcar item (substring-no-properties (car item))))))
-
-;;   ;; Undo-tree is too chatty about saving its history files. This doesn't
-;;   ;; totally suppress it logging to *Messages*, it only stops it from appearing
-;;   ;; in the echo-area.
-;;   (advice-add #'undo-tree-save-history :around #'doom-shut-up-a)
-
-;;   (global-undo-tree-mode +1))
-
+  (define-key undo-tree-map (kbd "C-/") nil)
+  (define-key undo-tree-map (kbd "C-_") nil)
+  (define-key undo-tree-map [remap undo] nil)
+  (define-key global-map (kbd "C-/") nil)
+  (global-set-key (kbd "C-/") 'undo))
 #+end_src
 
 ** undo
 #+begin_src emacs-lisp
-(after! undo-fu
-  (define-key undo-fu-mode-map [remap undo] nil)
-  (define-key global-map (kbd "C-/") nil)
-  (global-set-key (kbd "C-/") 'undo)
-  (global-set-key (kbd "M-z") 'undo-fu-only-undo)
-  (global-set-key (kbd "M-Z") 'undo-fu-only-redo)
-)
+;; (after! undo-fu
+;;   (define-key undo-fu-mode-map [remap undo] nil)
+;;   (define-key global-map (kbd "C-/") nil)
+;;   (global-set-key (kbd "C-/") 'undo)
+;;   (global-set-key (kbd "M-z") 'undo-fu-only-undo)
+;;   (global-set-key (kbd "M-Z") 'undo-fu-only-redo)
+;; )
 #+end_src
 
 ** tramp
@@ -629,6 +616,53 @@ Never use tabs. Tabs are the devil’s whitespace.
 ** rg
 #+begin_src emacs-lisp
 (setq counsel-rg-base-command '("rg" "-C" "2" "--max-columns" "240" "--with-filename" "--no-heading" "--line-number" "--color" "never" "%s"))
+#+end_src
+
+** avy-goto-char-2
+#+begin_src emacs-lisp
+;; (global-set-key (kbd "M-s M-s") 'avy-goto-char-timer)
+(global-set-key (kbd "M-s M-s") 'avy-goto-char-2)
+(setq avy-timeout-seconds 0.35)
+(setq avy-all-windows 't)
+#+end_src
+
+** better-jump
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c j p") 'better-jumper-jump-backward)
+(global-set-key (kbd "s-<") 'better-jumper-jump-backward)
+(global-set-key (kbd "C-c j n") 'better-jumper-jump-forward)
+(global-set-key (kbd "s->") 'better-jumper-jump-forward)
+(global-set-key (kbd "C-c j m") 'better-jumper-set-jump)
+(global-set-key (kbd "C-c j c") 'better-jumper-clear-jumps)
+(global-set-key (kbd "C-c j l") 'better-jumper-jump-newest)
+#+end_src
+
+** mark ring
+https://stackoverflow.com/questions/39000917/making-emacs-push-the-location-to-the-mark-ring-on-every-big-movement
+#+begin_src emacs-lisp
+;(defun my-set-mark ()
+;  (interactive)
+;  (push-mark (point) t nil))
+
+;(defadvice find-file (before set-mark activate) (my-set-mark))
+;(defadvice goto-char (before set-mark activate) (my-set-mark))
+;(defadvice goto-line (before set-mark activate) (my-set-mark))
+;(defadvice isearch-update (before set-mark activate) (my-set-mark))
+;(defadvice beginning-of-buffer (before set-mark activate) (my-set-mark))
+;(defadvice end-of-buffer (before set-mark activate) (my-set-mark))
+#+end_src
+
+https://stackoverflow.com/questions/25374287/how-to-move-to-the-last-point-position-before-popping-mark-ring?rq=1
+#+begin_src emacs-lisp
+;; (defun save-mark-before-pop ()
+;;   (push-mark (point) t)
+;;   (pop-mark))
+
+;; (advice-add 'pop-to-mark-command :before 'save-mark-before-pop)
+;; (setq set-mark-command-repeat-pop t)
+
+;; (defadvice set-mark-command (before record-current-position (arg) activate)
+;;   (when arg (push-mark)))
 #+end_src
 
 * isearch enhancements
@@ -853,6 +887,14 @@ https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/
   (setq org-agenda-files "~/Dropbox/Apps/org-agenda/agenda_files"))
 #+END_SRC
 
+** org refile targets
+#+begin_src emacs-lisp
+(after! org
+  ;;(setq org-refile-targets '((nil :maxlevel . 3) (org-agenda-files :maxlevel . 3)))
+  (add-to-list 'org-refile-targets '("~/Dropbox/Org/org-roam/study/20220605052908-capture.org"  :maxlevel . 3))
+)
+#+end_src
+
 ** Org Capture for alfred
    https://github.com/ifitzpat/org-capture-popclip-extension/blob/master/el/alfred-org-capture.el
 
@@ -860,19 +902,20 @@ https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/
      (defvar org-mac-context nil)
 
      ;;; Use org-mac to get link context and insert it to the captured item
-     ;; (add-hook 'org-capture-prepare-finalize-hook
-     ;;           (lambda ()
-     ;;             (when (equal
-     ;;                    (cdr (assoc 'name (frame-parameters (selected-frame))))
-     ;;                    "remember")
-     ;;               (progn
-     ;;                 (goto-char (point-max))
-     ;;                 (if org-mac-context
-     ;;                     (progn
-     ;;                       (insert (concat org-mac-context "\n"))
-     ;;                       (setq org-mac-context nil))
-     ;;                   nil)
-     ;;                 (call-interactively 'org-mac-grab-link)))))
+     (add-hook 'org-capture-prepare-finalize-hook
+               (lambda ()
+                 (when (equal
+                        (cdr (assoc 'name (frame-parameters (selected-frame))))
+                        "remember")
+                   (progn
+                     (goto-char (point-max))
+                     (if org-mac-context
+                         (progn
+                           (insert (concat org-mac-context "\n"))
+                           (setq org-mac-context nil))
+                       nil)
+                     ;;(call-interactively 'org-mac-link-link)
+                     ))))
 
      ;;; Delete frame when capture is done
      (add-hook 'org-capture-after-finalize-hook
@@ -892,8 +935,6 @@ https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/
                      ))
        (select-frame-by-name "remember")
        (org-capture))
-
-
 
 
      ;;     (add-to-list 'default-frame-alist '(height . 39))
@@ -1091,6 +1132,51 @@ https://emacs-china.org/t/org-mode/13248
 
 #+begin_src emacs-lisp
 (setq org-roam-directory "/Users/tru/Dropbox/Org/org-roam/")
+(defun tru/org-roam-node-find-by-tag ()
+  (interactive)
+    (let ((chosen-tag
+    (completing-read "filter by tag: "
+       (seq-uniq
+        (org-roam-db-query
+         [:select [tag]
+           :from tags ])))))
+      (org-roam-node-find
+       nil
+       nil
+       (lambda (node) (member chosen-tag (org-roam-node-tags node))))))
+#+end_src
+
+#+begin_src emacs-lisp
+
+(setq org-roam-capture-templates
+      '(
+        ("w" "workstuff" plain (file "/Users/tru/Dropbox/Org/org-roam/templates/workstuff.org")
+         :target (file+head "work/%<%Y%m%d%H%M%S>-${slug}.org"
+                            "#+title: ${title}\n") :unnarrowed t)
+        ("r" "research" plain (file "/Users/tru/Dropbox/Org/org-roam/templates/research.org")
+         :target (file+head "study/%<%Y%m%d%H%M%S>-${slug}.org"
+                            "#+title: ${title}\n") :unnarrowed t)
+        )
+)
+
+#+end_src
+
+*** org-roam-ui
+#+begin_src emacs-lisp
+(use-package! websocket
+    :after org-roam)
+
+(use-package! org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
 #+end_src
 
 ** Org-mouse
@@ -1201,6 +1287,134 @@ https://stackoverflow.com/questions/10969617/hiding-markup-elements-in-org-mode
   (org-mode-restart))
 #+end_src
 
+** org-bars
+#+begin_src emacs-lisp
+(use-package! org-bars)
+;; (after! org
+;;   (add-hook 'org-mode-hook #'org-bars-mode))
+#+end_src
+
+** org-mac-link
+#+begin_src emacs-lisp
+(when IS-MAC
+  (use-package! org-mac-link
+    :after org
+    :config
+    (setq org-mac-grab-Acrobat-app-p nil) ; Disable grabbing from Adobe Acrobat
+    (setq org-mac-grab-devonthink-app-p nil) ; Disable grabbinb from DevonThink
+    (map! :map org-mode-map          "C-c g"  #'org-mac-link-link)))
+#+end_src
+
+* Denote
+[[https://github.com/protesilaos/denote][protesilaos/denote: Simple notes for Emacs with an efficient file-naming scheme (we are close to the first stable release)]]
+
+#+begin_src emacs-lisp
+;; (use-package! denote
+;;   :config
+;;   (add-hook 'find-file-hook #'denote-link-buttonize-buffer)
+
+;;   ;; Remember to check the doc strings of those variables.
+;;   (setq denote-directory (expand-file-name "~/Dropbox/Org/denote/note"))
+;;   (setq denote-known-keywords
+;;         '("emacs" "research" "work" "todo"))
+;;   (setq denote-infer-keywords t)
+;;   (setq denote-sort-keywords t)
+;;   (setq denote-file-type nil) ; Org is the default, set others here
+
+;;   ;; We allow multi-word keywords by default.  The author's personal
+;;   ;; preference is for single-word keywords for a more rigid workflow.
+;;   (setq denote-allow-multi-word-keywords t)
+;;   (setq denote-front-matter-date-format nil) ; change this to `org-timestamp' or custom string
+
+;;   (defun my-denote-markdown-toml ()
+;;     "Create Markdown+TOML note in ~/Documents/blog/."
+;;     (interactive)
+;;     (let ((denote-file-type 'markdown-toml)
+;;           (denote-directory "~/Dropbox/Org/denote/note"))
+;;       (call-interactively #'denote)))
+
+;;   (defun my-denote-work ()
+;;     (interactive)
+;;     (let ((denote-directory "~/Dropbox/Org/denote/work/"))
+;;       (call-interactively #'denote)))
+
+;;   (defun my-denote-research ()
+;;     (interactive)
+;;     (let ((denote-directory "~/Dropbox/Org/denote/research/"))
+;;       (call-interactively #'denote)))
+
+;;   (defun my-denote-journal ()
+;;     "Create an entry tagged 'journal', while prompting for a title."
+;;     (interactive)
+;;     (let ((denote-file-type 'org) ; it supports other file types as well: read its doc string
+;;           (denote-directory "~/Dropbox/Org/denote/journal/"))
+;;       (denote
+;;        (denote--title-prompt)
+;;        "journal"))
+;;     )
+;; )
+#+end_src
+
+#+begin_src emacs-lisp
+;; Denote does not define any key bindings.  This is for the user to
+;; decide.  For example:
+;; (let ((map global-map))
+;;   (define-key map (kbd "C-c n e j") #'my-denote-journal) ; our custom command
+;;   (define-key map (kbd "C-c n e n") #'denote)
+;;   (define-key map (kbd "C-c n e N") #'denote-type)
+;;   (define-key map (kbd "C-c n e d") #'denote-date)
+;;   ;; If you intend to use Denote with a variety of file types, it is
+;;   ;; easier to bind the link-related commands to the `global-map', as
+;;   ;; shown here.  Otherwise follow the same pattern for `org-mode-map',
+;;   ;; `markdown-mode-map', and/or `text-mode-map'.
+;;   (define-key map (kbd "C-c n e i") #'denote-link) ; "insert" mnemonic
+;;   (define-key map (kbd "C-c n e I") #'denote-link-add-links)
+;;   (define-key map (kbd "C-c n e l") #'denote-link-find-file) ; "list" links
+;;   (define-key map (kbd "C-c n e b") #'denote-link-backlinks)
+;;   ;; Note that `denote-dired-rename-file' can work from any context, not
+;;   ;; just Dired bufffers.  That is why we bind it here to the
+;;   ;; `global-map'.
+;;   (define-key map (kbd "C-c n e r") #'denote-dired-rename-file))
+
+;; (with-eval-after-load 'org-capture
+;;   (require 'denote-org-capture)
+;;   (setq denote-org-capture-specifiers "%l\n%i\n%?")
+;;   (add-to-list 'org-capture-templates
+;;                '("n" "New note (with denote.el)" plain
+;;                  (file denote-last-path)
+;;                  #'denote-org-capture
+;;                  :no-save t
+;;                  :immediate-finish nil
+;;                  :kill-buffer t
+;;                  :jump-to-captured t)))
+#+end_src
+
+#+begin_src emacs-lisp
+;; (defvar prot-search--grep-hist '()
+;;   "Input history of grep searches.")
+
+;; ;;;###autoload
+;; (defun prot-search-grep (regexp &optional recursive)
+;;   "Run grep for REGEXP.
+
+;; Search in the current directory using `lgrep'.  With optional
+;; prefix argument (\\[universal-argument]) for RECURSIVE, run a
+;; search starting from the current directory with `rgrep'."
+;;   (interactive
+;;    (list
+;;     (read-from-minibuffer (concat (if current-prefix-arg
+;;                                       (propertize "Recursive" 'face 'warning)
+;;                                     "Local")
+;;                                   " grep for PATTERN: ")
+;;                           nil nil nil 'prot-search--grep-hist)
+;;     current-prefix-arg))
+;;   (unless grep-command
+;;     (grep-compute-defaults))
+;;   (if recursive
+;;       (rgrep regexp "*" default-directory)
+;;     (lgrep regexp "*" default-directory)))
+#+end_src
+
 * Email
 ** +mu4e+
 #+begin_src emacs-lisp
@@ -1226,7 +1440,7 @@ https://stackoverflow.com/questions/10969617/hiding-markup-elements-in-org-mode
 #+end_src
 
 #+begin_src emacs-lisp
-(mm-display-parts (mm-dissect-buffer))
+;(mm-display-parts (mm-dissect-buffer))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -1358,7 +1572,9 @@ https://stackoverflow.com/questions/10969617/hiding-markup-elements-in-org-mode
 
 * Deft
 #+begin_src emacs-lisp
-(setq deft-directory "~/Dropbox/Org")
+(setq deft-directory "~/Dropbox/Org"
+      deft-extensions '("txt" "org")
+      deft-recursive t)
 #+end_src
 
 * Display ansi color
@@ -1427,7 +1643,7 @@ CLOSED: [2020-02-26 Wed 03:48]
   =brew install ispell=
 
   #+BEGIN_SRC emacs-lisp
-    (setq ispell-program-name "/usr/local/bin/ispell")
+    (setq ispell-program-name "/opt/homebrew/bin/ispell")
 
     (define-key ctl-x-map "\C-i"
       #'endless/ispell-word-then-abbrev)
@@ -1485,12 +1701,13 @@ CLOSED: [2020-02-26 Wed 03:48]
 
   (setq easy-hugo-bloglist
         ;; blog2 setting
-        '(((easy-hugo-basedir . "~/Dropbox/git/gitlab/ubnt-hugo-blog/blog-ui/")
+        '(((easy-hugo-basedir . "/Users/tru/Dropbox/git/src/git.ubnt.com.cn/ubnt-hugo-blog/blog-ui/")
            (easy-hugo-url . "http://blog.stg.ui.com.cn")
            )
           ;; blog5 for github pages
-          ;; ((easy-hugo-basedir . "~/src/github.com/masasam/githubpages/")
-          ;;  (easy-hugo-url . "https://yourid.github.io"))
+          ((easy-hugo-basedir . "~/Dropbox/git/src/github.com/Ubiquiti-UID/uid.manual/")
+           (easy-hugo-url . "https://developer.uid.ui.com")
+           (easy-hugo-postdir . "~/Dropbox/git/src/github.com/Ubiquiti-UID/uid.manual/content/UID"))
           ;; ;; blog6 for firebase hosting
           ;; ((easy-hugo-basedir . "~/src/github.com/masasam/firebase/")
           ;;  (easy-hugo-url . "https://yourproject.firebaseapp.com"))
@@ -1706,7 +1923,7 @@ https://github.com/Artawower/blamer.el
                    :italic t
                     )))
   :config
-  (global-blamer-mode 1))
+  (global-blamer-mode 0))
 #+end_src
 
 * silicon-el
