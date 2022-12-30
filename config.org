@@ -284,13 +284,13 @@
 
 ** Doom-modeline
 #+begin_src emacs-lisp
-(after! doom-modeline
-  (doom-modeline-def-modeline 'my/modeline
-    '(bar matches buffer-info remote-host buffer-position parrot selection-info)
-    '(misc-info minor-modes checker input-method buffer-encoding major-mode process vcs))
-  (defun setup-custom-doom-modeline ()
-    (doom-modeline-set-modeline 'my/modeline 'default))
-  (add-hook 'doom-modeline-mode-hook 'setup-custom-doom-modeline))
+;; (after! doom-modeline
+;;   (doom-modeline-def-modeline 'my/modeline
+;;     '(bar matches buffer-info remote-host buffer-position parrot selection-info)
+;;     '(misc-info minor-modes checker input-method buffer-encoding major-mode process vcs))
+;;   (defun setup-custom-doom-modeline ()
+;;     (doom-modeline-set-modeline 'my/modeline 'default))
+;;   (add-hook 'doom-modeline-mode-hook 'setup-custom-doom-modeline))
 
 ;; (custom-set-faces!
 ;;   '(mode-line :height 180)
@@ -589,12 +589,12 @@ Never use tabs. Tabs are the devil’s whitespace.
 
 ** undo-tree
 #+begin_src emacs-lisp
-(after! undo-tree
-  (define-key undo-tree-map (kbd "C-/") nil)
-  (define-key undo-tree-map (kbd "C-_") nil)
-  (define-key undo-tree-map [remap undo] nil)
-  (define-key global-map (kbd "C-/") nil)
-  (global-set-key (kbd "C-/") 'undo))
+;; (after! undo-tree
+;;   (define-key undo-tree-map (kbd "C-/") nil)
+;;   (define-key undo-tree-map (kbd "C-_") nil)
+;;   (define-key undo-tree-map [remap undo] nil)
+;;   (define-key global-map (kbd "C-/") nil)
+;;   (global-set-key (kbd "C-/") 'undo))
 #+end_src
 
 ** undo
