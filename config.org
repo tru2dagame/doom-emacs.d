@@ -1,0 +1,123 @@
+* Doom default config
+#+begin_src emacs-lisp
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+
+;; Place your private configuration here! Remember, you do not need to run 'doom
+;; refresh' after modifying this file!
+
+;; Key Configuration for Doom as Vanilla Emacs
+;;(setq evil-default-state 'emacs)
+
+;; Some functionality uses this to identify you, e.g. GPG configuration, email
+;; clients, file templates and snippets.
+(setq user-full-name "Tru"
+      user-mail-address "tru.zhou@gmail.com")
+
+;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
+;; are the three important ones:
+;;
+;; + `doom-font'
+;; + `doom-variable-pitch-font'
+;; + `doom-big-font' -- used for `doom-big-font-mode'
+;;
+;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
+;; font string. You generally only need these two:
+
+;; (setq doom-font (font-spec :family "Operator Mono SSm" :size 20))
+;;(set-face-attribute 'default nil :family "Operator Mono SSm Lig" :weight 'normal)
+;(setq doom-font (font-spec :family "Operator Mono SSm Lig" :weight 'normal :size 20))
+(setq doom-font (font-spec :family "MesloLGS NF" :weight 'normal :size 20)
+      doom-variable-pitch-font (font-spec :family "MesloLGS NF" :size 20))
+(setq doom-unicode-font doom-font)
+
+;; There are two ways to load a theme. Both assume the theme is installed and
+;; available. You can either set `doom-theme' or manually load a theme with the
+;; `load-theme' function. These are the defaults.
+;; (setq doom-theme 'doom-one)
+;; (load-theme 'doom-one)
+
+;; If you intend to use org, it is recommended you change this!
+(setq org-directory "~/Dropbox/Org")
+
+;; If you want to change the style of line numbers, change this to `relative' or
+;; `nil' to disable it:
+(setq display-line-numbers-type t)
+#+end_src
+* macOS
+** Define const =is-a-mac=
+#+begin_src emacs-lisp
+(defconst *is-a-mac* (eq system-type 'darwin))
+#+end_src
+
+** keybinding
+#+begin_src emacs-lisp
+(when *is-a-mac*
+  (setq mac-command-modifier 'meta)
+  (setq mac-option-modifier 'super)
+  ;; Make mouse wheel / trackpad scrolling less jerky
+  (setq mouse-wheel-scroll-amount '(1
+                                    ((shift) . 5)
+                                    ((control))))
+  (dolist (multiple '("" "double-" "triple-"))
+    (dolist (direction '("right" "left"))
+      (global-set-key (read-kbd-macro (concat "<" multiple "wheel-" direction ">")) 'ignore)))
+  (global-set-key (kbd "M-`") 'ns-next-frame)
+  (global-set-key (kbd "M-h") 'ns-do-hide-emacs)
+  (global-set-key (kbd "M-˙") 'ns-do-hide-others)
+  )
+(global-set-key (kbd "M-v") 'yank)
+(global-set-key (kbd "M-V") 'scroll-down)
+#+end_src
+
+** macOS Daemon
+#+begin_src emacs-lisp
+(when *is-a-mac*
+  (setq mac-pseudo-daemon-mode 't)
+  (mac-pseudo-daemon-mode 1))
+#+end_src
+
+** Others
+#+begin_src emacs-lisp
+;;(global-set-key (kbd "C-x C-b") 'ibuffer)
+#+end_src
+
+** Dictionary
+#+begin_src emacs-lisp
+;; Support Chinese word
+;; (setq osx-dictionary-use-chinese-text-segmentation t)
+
+;; Key bindings
+(global-set-key (kbd "C-c d") 'osx-dictionary-search-word-at-point)
+;; (global-set-key (kbd "C-c i") 'osx-dictionary-search-input)
+
+;; Work with popwin-el (https://github.com/m2ym/popwin-el)
+;; (push "*osx-dictionary*" popwin:special-display-config)
+#+end_src
+
+** Quickly visit macOS configuration
+*** zshrc
+#+begin_src emacs-lisp
+(defun tru/visit-custom-dotzshrc ()
+  (interactive)
+  (find-file "/Users/tru/Dropbox/Dev/configs/zshrc.d/README.org"))
+(global-set-key (kbd "ESC ESC z") 'tru/visit-custom-dotzshrc)
+#+end_src
+
+*** zsh custom functions
+#+begin_src emacs-lisp
+(defun tru/visit-custom-functions ()
+  (interactive)
+  (find-file "/Users/tru/Dropbox/git/src/github.com/Ubiquiti-UID/uid.literate-devops/README.org"))
+(global-set-key (kbd "ESC ESC f") 'tru/visit-custom-functions)
+#+end_src
+
+** org-mac-iCal.el – import Mac OS X iCal.app events into Emacs diary
+https://orgmode.org/worg/org-contrib/org-mac-iCal.html
+https://github.com/ndw/org-mac-iCal
+#+begin_src emacs-lisp
+;; #(use-package! org-mac-iCal)
+(load-file "/Users/tru/Dropbox/git/src/github.com/tru2dagame/org-mac-iCal/org-mac-iCal.el")
+;; (load-file (locate-library "org-mac-iCal.el"))
+(add-to-list 'org-modules 'org-mac-iCal)
+(setq org-agenda-include-diary t)
+#+end_src
