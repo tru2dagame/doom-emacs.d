@@ -53,5 +53,8 @@
   :recipe (:host github :repo "DarwinAwardWinner/mac-pseudo-daemon"
            :files ("mac-pseudo-daemon.el" ))
   :pin "94240ebb716f11af8427b6295c3f44c0c43419d3")
+(package! nyan-mode)
+(package! sudo-edit)
+(package! super-save)
 
 ;; end

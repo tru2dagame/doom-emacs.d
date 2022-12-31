@@ -1,3 +1,47 @@
+#+TITLE: Config
+#+AUTHOR: Tru Zhou
+#+STARTUP: show2levels
+#+PROPERTY: header-args :comments yes :results silent
+
+* Contents                                                                      :TOC_5:
+:PROPERTIES:
+:TOC:      :include all
+:END:
+
+- [[#doom-default-config][Doom default config]]
+- [[#ui][UI]]
+  - [[#doom-dashboard-ascii-banner][Doom dashboard ascii banner]]
+  - [[#toggle-transparency][toggle-transparency]]
+  - [[#nyan-mode][nyan-mode]]
+  - [[#tabs][Tabs]]
+  - [[#ivy-postframe][ivy-postframe]]
+  - [[#tag-everywhere][Tag everywhere]]
+  - [[#window][window]]
+  - [[#display-line-number][Display Line Number]]
+- [[#frame-size][Frame size]]
+- [[#quickly-visit-emacs-configuration][Quickly visit Emacs configuration]]
+- [[#macos][macOS]]
+  - [[#define-const-is-a-mac][Define const =is-a-mac=]]
+  - [[#keybinding][keybinding]]
+  - [[#macos-daemon][macOS Daemon]]
+  - [[#others][Others]]
+  - [[#dictionary][Dictionary]]
+  - [[#quickly-visit-macos-configuration][Quickly visit macOS configuration]]
+    - [[#zshrc][zshrc]]
+    - [[#zsh-custom-functions][zsh custom functions]]
+  - [[#org-mac-icalel--import-mac-os-x-icalapp-events-into-emacs-diary][org-mac-iCal.el – import Mac OS X iCal.app events into Emacs diary]]
+- [[#editing][Editing]]
+  - [[#sudo-edit][sudo edit]]
+  - [[#auto-save][Auto Save]]
+  - [[#super-save][Super Save]]
+  - [[#always-indent-with-spaces][Always indent with spaces]]
+  - [[#undo-tree][undo-tree]]
+  - [[#tramp][tramp]]
+  - [[#rg][rg]]
+  - [[#avy-goto-char-2][avy-goto-char-2]]
+  - [[#better-jump][better-jump]]
+  - [[#isearch-enhancements][isearch enhancements]]
+
 * Doom default config
 #+begin_src emacs-lisp
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
@@ -43,6 +87,265 @@
 ;; `nil' to disable it:
 (setq display-line-numbers-type t)
 #+end_src
+
+* UI
+** Doom dashboard ascii banner
+
+#+begin_example sh
+"           _____"
+"         ===///    , ,-. ,-   .-, , , ,-  ,_  ,  ,_ ,-"
+"         --///    /_ |_/ _)  /''|/|/ |_] /=_ /_ /=_ _)"
+"       ___///    __    __  __  ______  ____    ___"
+"         ///  --/||  --// .'   //  '/ _//  )) (|  '/"
+"     ---///   /' ||  _//.;  __//_.    //_=''  _\\"
+"     --///- -/---||  //'||   //  ', _//  ;|     \\     ;"
+" _____/// __/_  _||_/<  `||_//__'/ _// --|\ /-._//    /"
+"    _///      ,                        ---\\\       .'"
+" ___///_____'/                              `;=__.-'"
+
+
+
+
+
+"                    _..n-'''/''--.._ "
+"                 .n' _.-\-''('''--._`-. "
+"               ,' .\'   \   `.      ``';. "
+"           ___/_-'  |    \    `.         `. "
+"         ===///    , ,-. .-   .-; , , ,-  ,L  ,  ,_ ,- "
+"         --///    /_ |_/ _)  /''|/|/ |_] /=_ /_ /=_ _) "
+"       ___///    __    __  __  ______  ____ |  ___ "
+"         ///  --/||  --// .'   //  '/ _//  ))|(|  '/ "
+"     ---///   /' ||  _//.;  __//_.    //_=''  _\\ "
+"     --///- -/---||  //'||   //  ', _//  ;|     \\     ; "
+"______///|__/_  _||_/<  ||_ //__'/ _// --|\ /-._//    / "
+"    _///  |   ,   |          \         ---\\\       .' "
+" ___///_____'/     \         \             /`;=__.-' "
+"            \       \         \           / "
+"             `.      \        \         ,' "
+"               `.     \        \      ,' "
+"                 `-._  \        \ _.-' "
+"                     `--\......--' "
+
+
+
+#+end_example
+
+
+#+begin_src emacs-lisp
+(defun doom-dashboard-draw-ascii-emacs-banner-fn ()
+  (let* ((banner
+          '(
+"           _____"
+"         ===///    , ,-. ,-   .-, , , ,-  ,_  ,  ,_ ,-"
+"         --///    /_ |_/ _)  /''|/|/ |_] /=_ /_ /=_ _)"
+"       ___///    __    __  __  ______  ____    ___"
+"         ///  --/||  --// .'   //  '/ _//  )) (|  '/"
+"     ---///   /' ||  _//.;  __//_.    //_=''  _\\"
+"     --///- -/---||  //'||   //  ', _//  ;|     \\     ;"
+" _____/// __/_  _||_/<  `||_//__'/ _// --|\ /-._//    /"
+"    _///      ,                        ---\\\       .'"
+" ___///_____'/                              `;=__.-'"
+" "
+" "
+
+))
+         (longest-line (apply #'max (mapcar #'length banner))))
+    (put-text-property
+     (point)
+     (dolist (line banner (point))
+       (insert (+doom-dashboard--center
+                +doom-dashboard--width
+                (concat
+                 line (make-string (max 0 (- longest-line (length line)))
+                                   32)))
+               "\n"))
+     'face 'doom-dashboard-banner)))
+
+(unless (display-graphic-p) ; for some reason this messes up the graphical splash screen atm
+  (setq +doom-dashboard-ascii-banner-fn #'doom-dashboard-draw-ascii-emacs-banner-fn))
+(setq +doom-dashboard-ascii-banner-fn #'doom-dashboard-draw-ascii-emacs-banner-fn)
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+(defun my-weebery-is-always-greater ()
+  (mapc (lambda (line)
+          (insert (propertize (+doom-dashboard--center +doom-dashboard--width line)
+                              'face 'doom-dashboard-banner) " ")
+          (insert "\n"))
+        '(
+"█████╗   █████╗ ██╗     ██╗         ██████╗  ██████╗ ███╗   ██╗████████╗    ██╗     ██╗███████╗"
+"██╔══██╗██╔══██╗██║     ██║         ██╔══██╗██╔═══██╗████╗  ██║╚══██╔══╝    ██║     ██║██╔════╝"
+"██████╔╝███████║██║     ██║         ██║  ██║██║   ██║██╔██╗ ██║   ██║       ██║     ██║█████╗"
+"██╔══██╗██╔══██║██║     ██║         ██║  ██║██║   ██║██║╚██╗██║   ██║       ██║     ██║██╔══╝"
+"██████╔╝██║  ██║███████╗███████╗    ██████╔╝╚██████╔╝██║ ╚████║   ██║       ███████╗██║███████╗"
+"Emacs TRU Edition")))
+
+(setq +doom-dashboard-ascii-banner-fn #'my-weebery-is-always-greater)
+
+
+(defun my-weebery-is-always-greater ()
+  (mapc (lambda (line)
+          (insert (propertize (+doom-dashboard--center +doom-dashboard--width line)
+                              'face 'doom-dashboard-banner) " ")
+          (insert "\n"))
+        '(
+"           _____"
+"         ===///    , ,-. ,-   .-, , , ,-  ,_  ,  ,_ ,-"
+"         --///    /_ |_/ _)  /''|/|/ |_] /=_ /_ /=_ _)"
+"       ___///    __    __  __  ______  ____    ___"
+"         ///  --/||  --// .'   //  '/ _//  )) (|  '/"
+"     ---///   /' ||  _//.;  __//_.    //_=''  _\\"
+"     --///- -/---||  //'||   //  ', _//  ;|     \\     ;"
+" _____/// __/_  _||_/<  ||_ //__'/ _// --|\ /-._//    /"
+"    _///      ,                        ---\\\       .'"
+" ___///_____'/                              `;=__.-'"
+
+          )))
+
+(setq +doom-dashboard-ascii-banner-fn #'my-weebery-is-always-greater)
+#+end_src
+
+** toggle-transparency
+#+begin_src emacs-lisp
+(when (display-graphic-p)
+  (add-hook 'window-setup-hook #'+ui/toggle-transparency)
+  )
+#+end_src
+
+#+begin_src emacs-lisp
+(defun +ui/toggle-transparency ()
+  (interactive)
+  (let ((alpha (frame-parameter nil 'alpha)))
+    (set-frame-parameter
+      nil 'alpha
+      (if (eql (cond ((numberp alpha) alpha)
+                     ((numberp (cdr alpha)) (cdr alpha))
+                     ;; Also handle undocumented (<active> <inactive>) form.
+                     ((numberp (cadr alpha)) (cadr alpha)))
+               100)
+          '(90 . 80) '(100 . 100)))))
+
+(map!
+ "s-u"                         #'+ui/toggle-transparency
+ :leader
+ :prefix ("t" . "toggle")
+ :desc "Transparency"
+ :n "t" #'+ui/toggle-transparency)
+#+end_src
+
+** nyan-mode
+#+begin_src emacs-lisp
+(use-package! nyan-mode
+  :after doom-modeline
+  :init
+  (setq
+        ;; nyan-animate-nyancat t
+        ;; nyan-wavy-trail t
+        nyan-minimum-window-width 81
+        nyan-bar-length 24)
+  (nyan-mode t))
+#+end_src
+
+** Tabs
+#+begin_src emacs-lisp
+(after! centaur-tabs
+  ;;(centaur-tabs-group-by-projectile-project)
+  (define-key global-map "\C-q" nil)
+  (global-set-key (kbd "C-S-<tab>") 'centaur-tabs-backward)
+  (global-set-key (kbd "C-<tab>") 'centaur-tabs-forward)
+)
+#+end_src
+
+#+begin_src emacs-lisp
+;; (define-key global-map (kbd "C-q") (make-sparse-keymap))
+;; (global-tab-line-mode 1)
+;; ;global-map <C-tab>
+;; (define-key global-map (kbd "C-<tab>") nil)
+;; (global-set-key (kbd "C-<tab>") 'tab-line-switch-to-next-tab)
+;; (global-set-key (kbd "C-S-<tab>") 'tab-line-switch-to-prev-tab)
+;; (tab-bar-mode 1)
+;; (global-set-key (kbd "ESC C-<tab>") 'tab-bar-switch-to-prev-tab)
+;; (global-set-key (kbd "ESC C-S-<tab>") 'tab-bar-switch-to-next-tab)
+;; (global-set-key (kbd "C-q C-q RET") 'tab-bar-select-tab-by-name)
+#+end_src
+
+** ivy-postframe
+#+begin_src emacs-lisp
+(after! ivy-posframe
+  (setq ivy-posframe-display-functions-alist
+        '((swiper          . ivy-posframe-display-at-point)
+          (complete-symbol . ivy-posframe-display-at-point)
+          (t               . ivy-posframe-display-at-frame-top-center))
+        ivy-posframe-parameters '((internal-border-width . 10)))
+  (setq ivy-posframe-height-alist '((swiper . 20)
+                                    (t      . 35)))
+  (ivy-posframe-mode 1))
+#+end_src
+
+** TODO Tag everywhere
+https://gist.github.com/rougier/f0f291f681cb5b95aef5ad51a83166fd
+https://www.reddit.com/r/emacs/comments/jc4uou/tags_everywhere/
+
+** window
+#+begin_src emacs-lisp
+(global-set-key (kbd "M-s-<left>") 'shrink-window-horizontally)
+(global-set-key (kbd "M-s-<right>") 'enlarge-window-horizontally)
+(global-set-key (kbd "M-s-<down>") 'shrink-window)
+(global-set-key (kbd "M-s-<up>") 'enlarge-window)
+;(setq window-safe-min-height 18)
+#+end_src
+
+helm window size
+
+#+begin_src emacs-lisp
+(setq helm-autoresize-max-height 50)
+(setq helm-autoresize-min-height 45)
+;(helm-autoresize-mode 1)
+#+end_src
+
+** Display Line Number
+#+begin_src emacs-lisp
+(setq display-line-numbers-type 'relative)
+#+end_src
+
+* Frame size
+[[https://www.reddit.com/r/emacs/comments/9c0a4d/tip_setting_initial_frame_size_and_position/][Tip: Setting initial frame size and position : emacs]]
+#+begin_src emacs-lisp
+;; Set initial frame size and position
+;; (defun my/set-initial-frame ()
+;;   (let* ((base-factor 0.81)
+;; 	(a-width (* (display-pixel-width) base-factor))
+;;         (a-height (* (display-pixel-height) base-factor))
+;;         (a-left (truncate (/ (- (display-pixel-width) a-width) 2)))
+;; 	(a-top (truncate (/ (- (display-pixel-height) a-height) 2))))
+;;     (set-frame-position (selected-frame) a-left a-top)
+;;     (set-frame-size (selected-frame) (truncate a-width)  (truncate a-height) t)))
+;; (setq frame-resize-pixelwise t)
+;; (my/set-initial-frame)
+#+end_src
+
+#+begin_src emacs-lisp
+(add-to-list 'default-frame-alist '(top . 10))
+(add-to-list 'default-frame-alist '(left . 81))
+
+(add-to-list 'default-frame-alist '(height . 50))
+(add-to-list 'default-frame-alist '(width . 153))
+;(add-to-list 'default-frame-alist '(top . 10))
+;(add-to-list 'default-frame-alist '(top . 81))
+#+end_src
+
+* Quickly visit Emacs configuration
+#+BEGIN_SRC emacs-lisp
+(defun tru/visit-emacs-config ()
+  (interactive)
+  (find-file "/Users/tru/Dropbox/Apps/emacs/tru/doom-emacs/config.org"))
+(global-set-key (kbd "ESC ESC e") 'tru/visit-emacs-config)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "ESC ESC ESC") 'doom/switch-to-scratch-buffer)
+#+END_SRC
+
 * macOS
 ** Define const =is-a-mac=
 #+begin_src emacs-lisp
@@ -95,6 +398,7 @@
 #+end_src
 
 ** Quickly visit macOS configuration
+
 *** zshrc
 #+begin_src emacs-lisp
 (defun tru/visit-custom-dotzshrc ()
@@ -120,4 +424,76 @@ https://github.com/ndw/org-mac-iCal
 ;; (load-file (locate-library "org-mac-iCal.el"))
 (add-to-list 'org-modules 'org-mac-iCal)
 (setq org-agenda-include-diary t)
+#+end_src
+
+* Editing
+** sudo edit
+#+BEGIN_SRC emacs-lisp
+(use-package! sudo-edit)
+#+END_SRC
+
+** Auto Save
+#+BEGIN_SRC emacs-lisp
+(setq auto-save-visited-file-name t)
+(setq auto-save-visited-interval 600)
+(auto-save-visited-mode +1)
+(setq buffer-save-without-query 't)
+#+END_SRC
+
+** Super Save
+#+begin_src emacs-lisp
+(use-package! super-save
+  :config
+  (super-save-mode +1)
+  (setq super-save-auto-save-when-idle t))
+#+end_src
+
+** Always indent with spaces
+Never use tabs. Tabs are the devil’s whitespace.
+#+BEGIN_SRC emacs-lisp
+(setq-default indent-tabs-mode nil)
+#+END_SRC
+
+** undo-tree
+#+begin_src emacs-lisp
+;; (after! undo-tree
+;;   (define-key undo-tree-map (kbd "C-/") nil)
+;;   (define-key undo-tree-map (kbd "C-_") nil)
+;;   (define-key undo-tree-map [remap undo] nil)
+;;   (define-key global-map (kbd "C-/") nil)
+;;   (global-set-key (kbd "C-/") 'undo))
+#+end_src
+
+** tramp
+#+begin_src emacs-lisp
+(setq tramp-shell-prompt-pattern "^[^$>\n]*[#$%>] *\\(\[[0-9;]*[a-zA-Z] *\\)*")
+#+end_src
+
+** rg
+#+begin_src emacs-lisp
+(setq counsel-rg-base-command '("rg" "-C" "2" "--max-columns" "240" "--with-filename" "--no-heading" "--line-number" "--color" "never" "%s"))
+#+end_src
+
+** avy-goto-char-2
+#+begin_src emacs-lisp
+;; (global-set-key (kbd "M-s M-s") 'avy-goto-char-timer)
+(global-set-key (kbd "M-s M-s") 'avy-goto-char-2)
+(setq avy-timeout-seconds 0.35)
+(setq avy-all-windows 't)
+#+end_src
+
+** better-jump
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c j p") 'better-jumper-jump-backward)
+(global-set-key (kbd "s-<") 'better-jumper-jump-backward)
+(global-set-key (kbd "C-c j n") 'better-jumper-jump-forward)
+(global-set-key (kbd "s->") 'better-jumper-jump-forward)
+(global-set-key (kbd "C-c j m") 'better-jumper-set-jump)
+(global-set-key (kbd "C-c j c") 'better-jumper-clear-jumps)
+(global-set-key (kbd "C-c j l") 'better-jumper-jump-newest)
+#+end_src
+
+** isearch enhancements
+#+begin_src emacs-lisp
+(setq search-whitespace-regexp ".*?")
 #+end_src
