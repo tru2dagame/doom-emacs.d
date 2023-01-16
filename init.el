@@ -29,7 +29,7 @@
          ;; +childframe
          +icons)
        (ivy               ; a search engine for love and life
-         +fuzzy            ; https://github.com/hlissner/doom-emacs/tree/develop/modules/completion/ivy
+         ;; +fuzzy            ; https://github.com/hlissner/doom-emacs/tree/develop/modules/completion/ivy
          ;; +childframe
          +icons)
        :ui
@@ -65,12 +65,12 @@
        file-templates    ; auto-snippets for empty files
        fold              ; (nigh) universal code folding
        ;;(format +onsave)  ; automated prettiness
-       ;;god               ; run Emacs commands without modifier keys
+       god               ; run Emacs commands without modifier keys
        ;;lispy             ; vim for lisp, for people who don't like vim
        multiple-cursors  ; editing in many places at once
        ;;objed             ; text object editing for the innocent
        ;;parinfer          ; turn lisp into python, sort of
-       rotate-text       ; cycle region at point between text candidates
+       rotate-text       ; cycle region at point between text candidates
        snippets          ; my elves. They type so I don't have to
        ;;word-wrap         ; soft wrapping with language-aware indent
 
@@ -91,7 +91,8 @@
 
        :checkers
        syntax              ; tasing you for every semicolon you forget
-       ;;(spell +flyspell) ; tasing you for misspelling mispelling
+       ;(spell +flyspell) ; tasing you for misspelling mispelling
+       spell
        ;;grammar           ; tasing grammar mistake every you make
 
        :tools
@@ -166,7 +167,19 @@
        ;;nim               ; python + lisp at the speed of c
        ;;nix               ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
-       org               ; organize your plain life in plain text
+       (org               ; organize your plain life in plain text
+                          ; https://github.com/doomemacs/doomemacs/tree/master/modules/lang/org
+        +contacts
+        ;; +passwords
+        +roam2
+        +dragndrop       ; drag & drop files/images into org buffers
+        +hugo            ; use Emacs for hugo blogging
+        +pandoc          ; export-with-pandoc support
+        +present        ; using org-mode for presentations
+        +pretty
+        +journal         ;Enables org-journal integration
+        )                 ; end org module
+
        php               ; perl's insecure younger brother
        plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional

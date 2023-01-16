@@ -2,6 +2,7 @@
 #+AUTHOR: Tru Zhou
 #+STARTUP: show2levels
 #+PROPERTY: header-args :comments yes :results silent
+#+auto_tangle: t
 
 * Contents                                                                      :TOC_5:
 :PROPERTIES:
@@ -14,16 +15,24 @@
   - [[#toggle-transparency][toggle-transparency]]
   - [[#nyan-mode][nyan-mode]]
   - [[#tabs][Tabs]]
+    - [[#centaur-tabs][centaur-tabs]]
+    - [[#tab-bar][tab-bar]]
+    - [[#tab-line][tab-line]]
+      - [[#tangle-no][tangle no]]
+    - [[#tabspaces][+tabspaces+]]
+  - [[#buffer][+Buffer+]]
   - [[#ivy][Ivy]]
     - [[#ivy-orderless][Ivy orderless]]
+    - [[#swiper][swiper]]
+  - [[#consult][consult]]
   - [[#tag-everywhere][Tag everywhere]]
-  - [[#window][window]]
+  - [[#window][Window]]
   - [[#display-line-number][Display Line Number]]
-- [[#frame-size][Frame size]]
-- [[#quickly-visit-emacs-configuration][Quickly visit Emacs configuration]]
+  - [[#display-ansi-color][Display ansi color]]
+  - [[#frame-size][Frame size]]
 - [[#macos][macOS]]
   - [[#define-const-is-a-mac][Define const =is-a-mac=]]
-  - [[#keybinding][keybinding]]
+  - [[#keybindings][Keybindings]]
   - [[#macos-daemon][macOS Daemon]]
   - [[#others][Others]]
   - [[#dictionary][Dictionary]]
@@ -32,6 +41,7 @@
     - [[#zsh-custom-functions][zsh custom functions]]
   - [[#org-mac-icalel--import-mac-os-x-icalapp-events-into-emacs-diary][org-mac-iCal.el – import Mac OS X iCal.app events into Emacs diary]]
 - [[#editing][Editing]]
+  - [[#quickly-visit-emacs-configuration][Quickly visit Emacs configuration]]
   - [[#sudo-edit][sudo edit]]
   - [[#auto-save][Auto Save]]
   - [[#super-save][Super Save]]
@@ -42,6 +52,53 @@
   - [[#avy-goto-char-2][avy-goto-char-2]]
   - [[#better-jump][better-jump]]
   - [[#isearch-enhancements][isearch enhancements]]
+  - [[#multiple-cursors][multiple-cursors]]
+  - [[#auto-mark][Auto Mark]]
+    - [[#source-code][Source Code]]
+    - [[#config][Config]]
+  - [[#magit][Magit]]
+    - [[#magit-status-here][magit-status-here]]
+    - [[#magit-gitflow][magit-gitflow]]
+  - [[#git-auto-commit][Git auto commit]]
+  - [[#flyspell-correct][flyspell-correct]]
+  - [[#workspace][Workspace]]
+  - [[#projectile][projectile]]
+  - [[#repeat-mode][repeat mode]]
+  - [[#god-mode][god mode]]
+- [[#org][Org]]
+  - [[#org-settings-from-purcell][Org settings from purcell]]
+  - [[#org-capture-template][Org capture template]]
+  - [[#org-mode-automatically-wrap-lines][org-mode automatically wrap lines]]
+  - [[#org-note-file][Org note file]]
+  - [[#org-agenda-file][Org Agenda File]]
+  - [[#org-refile-targets][org refile targets]]
+  - [[#org-capture-for-alfred][Org Capture for alfred]]
+  - [[#visit-daily-org-file][Visit daily org file]]
+  - [[#org-ansi][Org ansi]]
+  - [[#display-preferences][Display preferences]]
+  - [[#ob-async][Ob-async]]
+  - [[#ob-tmux][Ob-tmux]]
+  - [[#org-rifle][Org-rifle]]
+  - [[#org-clock-zone-color][Org clock zone color]]
+  - [[#org-babel][Org babel]]
+  - [[#org-debug][Org debug]]
+  - [[#org-table-valign][Org table valign]]
+  - [[#org-roam][Org-roam]]
+    - [[#org-roam-ui][org-roam-ui]]
+  - [[#org-mouse][Org-mouse]]
+  - [[#org-display-a-single-inline-image][Org display a single inline image]]
+  - [[#org-presentation][+Org presentation+]]
+  - [[#auto-babel-tangle][Auto babel tangle]]
+  - [[#org-auto-tangle-mode][Org auto tangle mode]]
+  - [[#org-toggle-emphasis][Org-toggle-emphasis]]
+  - [[#org-bars][+org-bars+]]
+  - [[#org-mac-link][org-mac-link]]
+- [[#tools][Tools]]
+  - [[#email][Email]]
+    - [[#mu4e][+mu4e+]]
+    - [[#notmuch][notmuch]]
+- [[#misc][Misc]]
+  - [[#auto-correct-words][Auto-Correct Words]]
 
 * Doom default config
 #+begin_src emacs-lisp
@@ -243,31 +300,365 @@
         ;; nyan-animate-nyancat t
         ;; nyan-wavy-trail t
         nyan-minimum-window-width 81
-        nyan-bar-length 24)
+        nyan-bar-length 24
+        doom-modeline-persp-name t
+        )
   (nyan-mode t))
 #+end_src
 
 ** Tabs
+*** centaur-tabs
 #+begin_src emacs-lisp
 (after! centaur-tabs
-  ;;(centaur-tabs-group-by-projectile-project)
-  (define-key global-map "\C-q" nil)
-  (global-set-key (kbd "C-S-<tab>") 'centaur-tabs-backward)
-  (global-set-key (kbd "C-<tab>") 'centaur-tabs-forward)
+  (centaur-tabs-group-by-projectile-project)
+  ;; (define-key global-map "\C-q" nil)
+  ;(global-set-key (kbd "C-S-<tab>") 'centaur-tabs-backward)
+  ;(global-set-key (kbd "C-<tab>") 'centaur-tabs-forward)
+  (global-set-key (kbd "C-s-f") 'centaur-tabs-move-current-tab-to-right)
+  (global-set-key (kbd "C-s-b") 'centaur-tabs-move-current-tab-to-left)
+
+  (centaur-tabs-enable-buffer-reordering)
+  (setq centaur-tabs-adjust-buffer-order 'left)
+
+;; https://github.com/ema2159/centaur-tabs/issues/113
+;; https://github.com/ema2159/centaur-tabs/issues/34
+;; Uniquify tab name when open multiple buffers with same filename.
+(setq uniquify-separator "/")
+;; (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
+(setq uniquify-buffer-name-style 'forward)
+(setq uniquify-after-kill-buffer-p t)
+
+;; https://emacs-china.org/t/emacs-vscode-tab/18011/69
+(defun wd/get-buffer-persp-group (buffer)
+    (let* ((name))
+      (dolist (persp (persp-persps))
+        (if persp
+            (if (persp-contain-buffer-p buffer persp)
+                (setq name (safe-persp-name persp)))))
+      name
+      ))
+
+  (defun centaur-tabs-buffer-groups ()
+    (list
+     (cond
+      ((or (string-equal "*" (substring (buffer-name) 0 1))
+         (memq major-mode '(magit-process-mode
+                            magit-status-mode
+                            magit-diff-mode
+                            magit-log-mode
+                            magit-file-mode
+                            magit-blob-mode
+                            magit-blame-mode
+                            )))
+     "Emacs")
+    ;; ((derived-mode-p 'eshell-mode)
+    ;;  "EShell")
+    ;; ((derived-mode-p 'emacs-lisp-mode)
+    ;;  "Elisp")
+    ;; ((derived-mode-p 'dired-mode)
+    ;;  "Dired")
+    ((memq major-mode '(org-mode org-agenda-mode diary-mode))
+     "OrgMode")
+    (t
+     (let ((name (wd/get-buffer-persp-group (current-buffer))))
+       (if name
+           name
+         ;;(centaur-tabs-get-group-name (current-buffer))
+         "Other"
+         )
+       )))))
 )
 #+end_src
 
+*** tab-bar
 #+begin_src emacs-lisp
+(define-key global-map "\C-q" nil)
 ;; (define-key global-map (kbd "C-q") (make-sparse-keymap))
 ;; (global-tab-line-mode 1)
 ;; ;global-map <C-tab>
 ;; (define-key global-map (kbd "C-<tab>") nil)
 ;; (global-set-key (kbd "C-<tab>") 'tab-line-switch-to-next-tab)
 ;; (global-set-key (kbd "C-S-<tab>") 'tab-line-switch-to-prev-tab)
-;; (tab-bar-mode 1)
-;; (global-set-key (kbd "ESC C-<tab>") 'tab-bar-switch-to-prev-tab)
-;; (global-set-key (kbd "ESC C-S-<tab>") 'tab-bar-switch-to-next-tab)
-;; (global-set-key (kbd "C-q C-q RET") 'tab-bar-select-tab-by-name)
+(tab-bar-mode 1)
+;(setq tab-bar-new-tab-choice "*doom*")
+(global-set-key (kbd "C-<tab>") 'tab-bar-switch-to-next-tab)
+(global-set-key (kbd "C-S-<tab>") 'tab-bar-switch-to-prev-tab)
+(global-set-key (kbd "C-q H") 'tab-bar-switch-to-prev-tab)
+(global-set-key (kbd "C-q L") 'tab-bar-switch-to-next-tab)
+(global-set-key (kbd "M-[") 'tab-bar-switch-to-prev-tab)
+(global-set-key (kbd "M-]") 'tab-bar-switch-to-next-tab)
+(global-set-key (kbd "C-s-f") 'tab-move)
+(global-set-key (kbd "C-s-b") 'tab-move-to)
+;(global-set-key (kbd "C-s-f") 'tab-move)
+;(global-set-key (kbd "C-s-b") 'tab-move-to)
+;(global-set-key (kbd "C-q C-w") 'tab-switch)
+(global-set-key (kbd "C-q c") 'tab-new)
+;;(global-set-key (kbd "C-q C-q RET") 'tab-bar-select-tab-by-name)
+#+end_src
+
+https://emacs.stackexchange.com/questions/64473/using-tab-bar-el-with-automatic-tab-management
+#+begin_src emacs-lisp :tangle no
+(add-hook 'find-file-hook
+          (lambda ()
+            (let ((tab-bar-new-tab-choice (buffer-name)))
+              (tab-bar-new-tab))))
+#+end_src
+#+begin_src emacs-lisp :tangle no
+(push '((lambda (b _a) (buffer-local-value 'buffer-file-name (get-buffer b)))
+        .
+        (display-buffer-in-tab (tab-name . (lambda (b _a) (buffer-name b)))))
+      display-buffer-alist)
+#+end_src
+
+*** tab-line
+#+begin_src emacs-lisp
+;(global-tab-line-mode 1)
+;(global-set-key (kbd "C-q C-h") 'tab-line-switch-to-prev-tab)
+;(global-set-key (kbd "C-q C-l") 'tab-line-switch-to-next-tab)
+;(global-set-key (kbd "C-s-f") 'my/shift-tab-right)
+;(global-set-key (kbd "C-s-b") 'my/shift-tab-left)
+;(global-set-key (kbd "C-s-f") 'tab-line-hscroll-left)
+;(global-set-key (kbd "C-s-b") 'tab-line-hscroll-right)
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+(setq tab-line-tabs-window-last-number 3)
+(defun tab-line-tabs-window-buffer-last()
+  (last (tab-line-tabs-window-buffers) tab-line-tabs-window-last-number))
+(tab-line-tabs-window-buffer-last)
+(setq tab-line-tabs-function 'tab-line-tabs-window-buffer-last)
+#+end_src
+
+**** tangle no
+
+#+begin_src emacs-lisp :tangle no
+  (tab-bar-mode -1)
+  (global-tab-line-mode t)
+
+  ;; set a local variable to boost performance
+  (defvar buffer-project-name "~")
+  (make-local-variable 'buffer-project-name)
+  (defun my/update-buf-proj-name()
+  (if (+workspace-contains-buffer-p)
+  (setq-local buffer-project-name (+workspace-current-name))
+  (setq-local buffer-project-name "other")))
+  ;; update local variable when major mode changes
+  (add-hook 'after-change-major-mode-hook 'my/update-buf-proj-name)
+
+  (defun my/tab-line-buffer-group (buffer)
+   (interactive)
+   (with-current-buffer buffer
+   (cond
+    ((s-match "scratch"  (buffer-name)) "Scratch")
+    ((string= major-mode "eshell-mode") "Eshell")
+    ((string= major-mode "dired-mode") "Dir")
+    ((string= major-mode "ranger-mode") "Dir")
+    ((string= major-mode "vterm-mode") "vTerm")
+    ((s-match "Customize"  (buffer-name)) "Customize")
+    ((s-match "magit:"  (buffer-name)) "Magit")
+    ((s-match "magit "  (buffer-name)) "Magit others")
+    ((s-match "magit-"  (buffer-name)) "Magit others")
+    ((string= (s-left 1 (buffer-name)) "*") "Utilities")
+    ;; group buffers using projectile
+    ((boundp 'buffer-project-name) buffer-project-name)
+    (major-mode (format-mode-line mode-name))
+    (t "other"))))
+  (setq tab-line-tabs-buffer-group-function #'my/tab-line-buffer-group)
+  (setq tab-line-tabs-function #'tab-line-tabs-buffer-groups)
+
+#+end_src
+#+begin_src emacs-lisp :tangle no
+;;(global-tab-line-mode t)
+
+(setq tab-line-new-button-show nil)  ;; do not show add-new button
+(setq tab-line-switch-cycling 't)
+(setq tab-line-separator " ")  ;; set it to empty
+
+;; (defvar my/tab-height 22)
+;; (defvar my/tab-left (powerline-wave-right 'tab-line nil my/tab-height))
+;; (defvar my/tab-right (powerline-wave-left nil 'tab-line my/tab-height))
+
+;; (defun my/tab-line-tab-name-buffer (buffer &optional _buffers)
+;;   (powerline-render (list my/tab-left
+;;                           (format "%s" (buffer-name buffer))
+;;                           my/tab-right)))
+;; (setq tab-line-tab-name-function #'my/tab-line-tab-name-buffer)
+
+;; ;; tab color settings
+;; (set-face-attribute 'tab-line nil ;; background behind tabs
+;;       :background "gray40"
+;;       :foreground "gray60" :distant-foreground "gray50"
+;;       :height 1.0 :box nil)
+;; (set-face-attribute 'tab-line-tab nil ;; active tab in another window
+;;       :inherit 'tab-line
+;;       :foreground "gray70" :background "gray90" :box nil)
+;; (set-face-attribute 'tab-line-tab-current nil ;; active tab in current window
+;;       :background "#b34cb3" :foreground "white" :box nil)
+;; (set-face-attribute 'tab-line-tab-inactive nil ;; inactive tab
+;;       :background "gray60" :foreground "black" :box nil)
+;; (set-face-attribute 'tab-line-highlight nil ;; mouseover
+;;       :background "white" :foreground 'unspecified)
+#+end_src
+#+begin_src emacs-lisp :tangle no
+(setq my/current-tab-list (list (current-buffer)))
+(setq tab-line-tabs-function 'tab-line-tabs-mode-buffers)
+;;  (setq tab-line-tabs-function 'tab-line-tabs-window-buffers)
+;;(setq tab-line-tabs-function 'tab-line-tabs-buffer-groups)
+#+end_src
+#+begin_src emacs-lisp :tangle no
+  (defun tab-line-tabs-mode-buffers ()
+    my/current-tab-list)
+ (defun my/add-current-buffer-to-tab ()
+    (interactive)
+    (setq my/current-tab-list (add-to-list 'my/current-tab-list (current-buffer)))
+ )
+
+  (add-hook 'find-file-hook 'my/add-current-buffer-to-tab)
+  (add-hook 'dired-mode-hook 'my/add-current-buffer-to-tab)
+  (add-hook 'recentf-mode-hook 'my/add-current-buffer-to-tab)
+
+ (defun my/close-tab ()
+    (interactive)
+    (setq my/current-tab-list (delete (current-buffer) my/current-tab-list))
+    (kill-buffer)
+    )
+ (defun my/shift-tab-left ()
+    (interactive)
+    (let ((n (seq-position my/current-tab-list (current-buffer))))
+      (when
+          (> n 0)
+        (progn
+          (setq my/current-tab-list
+                (append
+                 (seq-take my/current-tab-list (- n 1))
+                 (list (elt my/current-tab-list n))
+                 (list (elt my/current-tab-list (- n 1)))
+                 (seq-drop my/current-tab-list (+ n 1))
+                 )))))
+          (force-mode-line-update)
+    )
+
+    (defun my/shift-tab-right ()
+      (interactive)
+      (let ((n (seq-position my/current-tab-list (current-buffer))))
+        (when
+            (< n (- (length my/current-tab-list) 1))
+          (progn
+            (setq my/current-tab-list
+                  (append
+                   (seq-take my/current-tab-list n)
+                   (list (elt my/current-tab-list (+ n 1)))
+                   (list (elt my/current-tab-list n ))
+                   (seq-drop my/current-tab-list (+ n 2))
+                   )))))
+            (force-mode-line-update)
+      )
+ (defun my/drop-tab ()
+    (interactive)
+    (setq my/current-tab-list (delete (current-buffer) my/current-tab-list))
+    (switch-to-buffer (nth 0 my/current-tab-list))
+    )
+#+end_src
+#+begin_src emacs-lisp :tangle no
+  (defun tab-line-tabs-mode-buffers ()
+    my/current-tab-list)
+ (defun my/add-current-buffer-to-tab ()
+    (interactive)
+    (setq my/current-tab-list (add-to-list 'my/current-tab-list (current-buffer)))
+    )
+  (add-hook 'find-file-hook 'my/add-current-buffer-to-tab)
+  (add-hook 'dired-mode-hook 'my/add-current-buffer-to-tab)
+  (add-hook 'recentf-mode-hook 'my/add-current-buffer-to-tab)
+
+ (defun my/close-tab ()
+    (interactive)
+    (setq my/current-tab-list (delete (current-buffer) my/current-tab-list))
+    (kill-buffer)
+    )
+ (defun my/shift-tab-left ()
+    (interactive)
+    (let ((n (seq-position my/current-tab-list (current-buffer))))
+      (when
+          (> n 0)
+        (progn
+          (setq my/current-tab-list
+                (append
+                 (seq-take my/current-tab-list (- n 1))
+                 (list (elt my/current-tab-list n))
+                 (list (elt my/current-tab-list (- n 1)))
+                 (seq-drop my/current-tab-list (+ n 1))
+                 )))))
+          (force-mode-line-update)
+    )
+
+    (defun my/shift-tab-right ()
+      (interactive)
+      (let ((n (seq-position my/current-tab-list (current-buffer))))
+        (when
+            (< n (- (length my/current-tab-list) 1))
+          (progn
+            (setq my/current-tab-list
+                  (append
+                   (seq-take my/current-tab-list n)
+                   (list (elt my/current-tab-list (+ n 1)))
+                   (list (elt my/current-tab-list n ))
+                   (seq-drop my/current-tab-list (+ n 2))
+                   )))))
+            (force-mode-line-update)
+      )
+ (defun my/drop-tab ()
+    (interactive)
+    (setq my/current-tab-list (delete (current-buffer) my/current-tab-list))
+    (switch-to-buffer (nth 0 my/current-tab-list))
+    )
+#+end_src
+#+begin_src emacs-lisp :tangle no
+  (global-set-key (kbd "C-S-<tab>") 'tab-line-switch-to-prev-tab)
+  (global-set-key (kbd "C-<tab>") 'tab-line-switch-to-next-tab)
+;  (global-set-key (kbd "C-s-f") 'my/shift-tab-right)
+;  (global-set-key (kbd "C-s-b") 'my/shift-tab-left)
+#+end_src
+
+*** +tabspaces+
+#+begin_src emacs-lisp :tangle no
+(use-package! tabspaces
+  :hook (after-init . tabspaces-mode) ;; use this only if you want the minor-mode loaded at startup.
+  :commands (tabspaces-switch-or-create-workspace
+             tabspaces-open-or-create-project-and-workspace)
+  :custom
+  (tabspaces-use-filtered-buffers-as-default t)
+  (tabspaces-default-tab "Default")
+  (tabspaces-remove-to-default t)
+  (tabspaces-include-buffers '("*scratch*"))
+  ;; sessions
+  ;; (tabspaces-session t)
+  ;; (tabspaces-session-auto-restore t)
+  :bind
+  ;;  ("C-x b" . 'tabspaces-switch-to-buffer)
+  ("C-x b" . 'tabspaces-ivy-switch-buffer)
+  :config
+  (setq tab-line-new-button-show nil)  ;; do not show add-new button
+  (setq tab-line-switch-cycling 't)
+  (setq tab-line-separator " ")  ;; set it to empty
+)
+
+(defun tabspaces-ivy-switch-buffer (buffer &optional norecord force-same-window)
+  "Display the local buffer BUFFER in the selected window.
+This is the frame/tab-local equivilant to `switch-to-buffer'.
+The arguments NORECORD and FORCE-SAME-WINDOW are passed to `switch-to-buffer'."
+  (interactive
+   (list
+    (let ((blst (mapcar #'buffer-name (tabspaces-buffer-list))))
+      (read-buffer
+       "Switch to local buffer: " blst nil
+       (lambda (b) (member (if (stringp b) b (car b)) blst))))))
+  (ivy-switch-buffer buffer))
+
+#+end_src
+
+** +Buffer+
+#+begin_src emacs-lisp :tangle no
+(use-package! bufler)
 #+end_src
 
 ** Ivy
@@ -293,11 +684,20 @@ https://github.com/oantolin/orderless#ivy
 )
 #+end_src
 
+*** swiper
+#+begin_src emacs-lisp
+(after! ivy
+  (global-set-key (kbd "s-f") 'swiper-thing-at-point)
+  )
+#+end_src
+
+** consult
+
 ** TODO Tag everywhere
 https://gist.github.com/rougier/f0f291f681cb5b95aef5ad51a83166fd
 https://www.reddit.com/r/emacs/comments/jc4uou/tags_everywhere/
 
-** window
+** Window
 #+begin_src emacs-lisp
 (global-set-key (kbd "M-s-<left>") 'shrink-window-horizontally)
 (global-set-key (kbd "M-s-<right>") 'enlarge-window-horizontally)
@@ -309,8 +709,8 @@ https://www.reddit.com/r/emacs/comments/jc4uou/tags_everywhere/
 helm window size
 
 #+begin_src emacs-lisp
-(setq helm-autoresize-max-height 50)
-(setq helm-autoresize-min-height 45)
+;(setq helm-autoresize-max-height 50)
+;(setq helm-autoresize-min-height 45)
 ;(helm-autoresize-mode 1)
 #+end_src
 
@@ -319,7 +719,15 @@ helm window size
 (setq display-line-numbers-type 'relative)
 #+end_src
 
-* Frame size
+** Display ansi color
+  #+begin_src emacs-lisp
+    (defun tru/display-ansi-colors ()
+      (interactive)
+      (let ((inhibit-read-only t))
+        (ansi-color-apply-on-region (point-min) (point-max))))
+  #+end_src
+
+** Frame size
 [[https://www.reddit.com/r/emacs/comments/9c0a4d/tip_setting_initial_frame_size_and_position/][Tip: Setting initial frame size and position : emacs]]
 #+begin_src emacs-lisp
 ;; Set initial frame size and position
@@ -345,25 +753,13 @@ helm window size
 ;(add-to-list 'default-frame-alist '(top . 81))
 #+end_src
 
-* Quickly visit Emacs configuration
-#+BEGIN_SRC emacs-lisp
-(defun tru/visit-emacs-config ()
-  (interactive)
-  (find-file "/Users/tru/Dropbox/Apps/emacs/tru/doom-emacs/config.org"))
-(global-set-key (kbd "ESC ESC e") 'tru/visit-emacs-config)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "ESC ESC ESC") 'doom/switch-to-scratch-buffer)
-#+END_SRC
-
 * macOS
 ** Define const =is-a-mac=
 #+begin_src emacs-lisp
 (defconst *is-a-mac* (eq system-type 'darwin))
 #+end_src
 
-** keybinding
+** Keybindings
 #+begin_src emacs-lisp
 (when *is-a-mac*
   (setq mac-command-modifier 'meta)
@@ -414,16 +810,16 @@ helm window size
 #+begin_src emacs-lisp
 (defun tru/visit-custom-dotzshrc ()
   (interactive)
-  (find-file "/Users/tru/Dropbox/Dev/configs/zshrc.d/README.org"))
-(global-set-key (kbd "ESC ESC z") 'tru/visit-custom-dotzshrc)
+  (find-file (concat (getenv "TRU_D") "/Dev/configs/zshrc.d/README.org")))
+(global-set-key (kbd "<escape> <escape> z") 'tru/visit-custom-dotzshrc)
 #+end_src
 
 *** zsh custom functions
 #+begin_src emacs-lisp
 (defun tru/visit-custom-functions ()
   (interactive)
-  (find-file "/Users/tru/Dropbox/git/src/github.com/Ubiquiti-UID/uid.literate-devops/README.org"))
-(global-set-key (kbd "ESC ESC f") 'tru/visit-custom-functions)
+  (find-file (concat (getenv "GHQ_PATH") "/github.com/Ubiquiti-UID/uid.literate-devops/README.org")))
+(global-set-key (kbd "<escape> <escape> f") 'tru/visit-custom-functions)
 #+end_src
 
 ** org-mac-iCal.el – import Mac OS X iCal.app events into Emacs diary
@@ -438,6 +834,24 @@ https://github.com/ndw/org-mac-iCal
 #+end_src
 
 * Editing
+** Quickly visit Emacs configuration
+#+BEGIN_SRC emacs-lisp
+(defun tru/visit-emacs-config ()
+  (interactive)
+  ;; (find-file "~/.doom.d/config.org")
+  (find-file (concat (getenv "HOME") "/.doom.d/config.org")))
+(global-set-key (kbd "<escape> <escape> e") 'tru/visit-emacs-config)
+
+(defun tru/visit-project-scratch ()
+  (interactive)
+  (doom/switch-to-project-scratch-buffer))
+(global-set-key (kbd "<escape> <escape> x") 'tru/visit-project-scratch)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "<escape> <escape> 1") 'doom/switch-to-scratch-buffer)
+#+END_SRC
+
 ** sudo edit
 #+BEGIN_SRC emacs-lisp
 (use-package! sudo-edit)
@@ -473,6 +887,19 @@ Never use tabs. Tabs are the devil’s whitespace.
 ;;   (define-key undo-tree-map [remap undo] nil)
 ;;   (define-key global-map (kbd "C-/") nil)
 ;;   (global-set-key (kbd "C-/") 'undo))
+;; (define-key undo-fu-mode-map (kbd "C-/") nil)
+;; (define-key undo-fu-mode-map [remap undo] nil)
+
+;; (global-set-key (kbd "C-/") 'undo)
+(map!
+        (:map undo-fu-mode-map
+        "C-/" nil
+        [remap undo] nil)
+        (:map undo-tree-map
+         "C-/" nil
+         [remap undo] nil)
+
+        "C-/" #'undo)
 #+end_src
 
 ** tramp
@@ -496,9 +923,7 @@ Never use tabs. Tabs are the devil’s whitespace.
 ** better-jump
 #+begin_src emacs-lisp
 (global-set-key (kbd "C-c j p") 'better-jumper-jump-backward)
-(global-set-key (kbd "s-<") 'better-jumper-jump-backward)
 (global-set-key (kbd "C-c j n") 'better-jumper-jump-forward)
-(global-set-key (kbd "s->") 'better-jumper-jump-forward)
 (global-set-key (kbd "C-c j m") 'better-jumper-set-jump)
 (global-set-key (kbd "C-c j c") 'better-jumper-clear-jumps)
 (global-set-key (kbd "C-c j l") 'better-jumper-jump-newest)
@@ -508,3 +933,1223 @@ Never use tabs. Tabs are the devil’s whitespace.
 #+begin_src emacs-lisp
 (setq search-whitespace-regexp ".*?")
 #+end_src
+
+** multiple-cursors
+#+begin_src emacs-lisp
+(defhydra hydra-multiple-cursors (:hint nil)
+  "
+ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cursor%s(if (> (mc/num-cursors) 1) \"s\" \"\")
+------------------------------------------------------------------
+ [_p_]   Next     [_n_]   Next     [_l_] Edit lines  [_0_] Insert numbers
+ [_P_]   Skip     [_N_]   Skip     [_a_] Mark all    [_A_] Insert letters
+ [_M-p_] Unmark   [_M-n_] Unmark   [_s_] Search
+ [Click] Cursor at point       [_q_] Quit"
+  ("l" mc/edit-lines :exit t)
+  ("a" mc/mark-all-like-this :exit t)
+  ("n" mc/mark-next-like-this)
+  ("N" mc/skip-to-next-like-this)
+  ("M-n" mc/unmark-next-like-this)
+  ("p" mc/mark-previous-like-this)
+  ("P" mc/skip-to-previous-like-this)
+  ("M-p" mc/unmark-previous-like-this)
+  ("s" mc/mark-all-in-region-regexp :exit t)
+  ("0" mc/insert-numbers :exit t)
+  ("A" mc/insert-letters :exit t)
+  ("<mouse-1>" mc/add-cursor-on-click)
+  ;; Help with click recognition in this hydra
+  ("<down-mouse-1>" ignore)
+  ("<drag-mouse-1>" ignore)
+  ("q" nil))
+#+end_src
+
+** Auto Mark
+*** Source Code
+https://www.emacswiki.org/emacs/auto-mark.el
+#+begin_src emacs-lisp
+;;; auto-mark.el --- Mark automatically
+
+;; Copyright (C) 2008  MATSUYAMA Tomohiro
+
+;; Author: MATSUYAMA Tomohiro <t.matsuyama.pub@gmail.com>
+;; Keywords: convenience
+
+;; This file is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
+
+;; This file is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
+
+;;; Commentary:
+
+;; auto-mark push marks automatically when you change kind of command sequence.
+;; For example, previous-line and next-line is motion comman, and
+;; self-insert-command is edit (insert) command, so auto-mark will push
+;; a mark automatically after C-n if you type `C-p C-p C-n f o o',
+;; because `C-p C-p C-n' is motion command sequence and `f o o' is
+;; edit command sequence.
+
+;; auto-mark will regard a command as motion command if the command causes
+;; to move a point, and will regard a command as edit command if the command causes
+;; to change the buffer size.
+
+;; In addition, you can specify a kind of command by adding a pair of COMMAND and CLASS
+;; into `auto-mark-command-class-alist'. For example, if you want to make auto-mark to
+;; regard `goto-line' command as a jump command not move command to push a mark automatically
+;; when you goto-line even after move command sequence, add '(goto-line . jump) into the list
+;; so that auto-mark can detect command sequence changes.
+
+;; To use this package, please add following code into your .emacs:
+;; (require 'auto-mark)
+;; (global-auto-mark-mode 1)
+
+;;
+;; TODO documentation
+;;
+
+;;; Code:
+
+(eval-when-compile
+  (require 'cl))
+
+(defgroup auto-mark nil
+  "Mark automatically."
+  :group 'convenience
+  :prefix "auto-mark-")
+
+(defcustom auto-mark-command-class-alist
+  '((goto-line . jump))
+  "A list of (COMMAND . CLASS) for classfying command to CLASS.
+
+COMMAND is a symbol you want to try to classify.
+CLASS is a symbol for detecting a border where auro-mark should push mark.
+
+There is pre-defined CLASS:
+edit      edit command
+move      point move command
+ignore    make auto-mark ignore pushing mark"
+  :group 'auto-mark
+  :type '(alist :key-type symbol :value-type symbol))
+
+(defcustom auto-mark-command-classifiers nil
+  "A list of functions classifing command to class.
+The function takes one argument COMMAND,
+and returns CLASS."
+  :group 'auto-mark
+  :type '(repeat function))
+
+(defcustom auto-mark-ignore-move-on-sameline t
+  "Ignore move on same line."
+  :group 'auto-mark
+  :type 'boolean)
+
+(defvar auto-mark-previous-buffer-size nil
+  "Previous buffer size for detecting changes the buffer.")
+
+(defvar auto-mark-previous-point nil
+  "Previous point for detecting moves.")
+
+(defvar auto-mark-command-class nil
+  "Current command sequence class.")
+
+(defun auto-mark-classify-command (command)
+  (or (cdr-safe (assq command auto-mark-command-class-alist))
+      (let (class
+            (classifiers auto-mark-command-classifiers))
+        (while (and (consp classifiers) (null class))
+          (setq class (funcall (car classifiers) command))
+          (setq classifiers (cdr classifiers)))
+        class)))
+
+(defun auto-mark-pre-command-handle ()
+  (setq auto-mark-previous-buffer-size (buffer-size)
+        auto-mark-previous-point (point))
+  (auto-mark-handle-command-class
+   (auto-mark-classify-command this-command)))
+
+(defun auto-mark-post-command-handle ()
+  (auto-mark-handle-command-class
+   (if (eq 'ignore (auto-mark-classify-command this-command))
+       'ignore
+     (if (/= auto-mark-previous-buffer-size (buffer-size))
+         'edit
+
+       (if (or (and auto-mark-ignore-move-on-sameline
+                    (/= (line-number-at-pos auto-mark-previous-point)
+                        (line-number-at-pos (point))))
+               (/= auto-mark-previous-point (point)))
+           'move)))))
+
+(defun auto-mark-handle-command-class (class)
+  (if (and class
+           (not (or (eq class 'ignore)
+                    (eq class auto-mark-command-class))))
+      (progn
+        (push-mark auto-mark-previous-point t nil)
+        (setq auto-mark-command-class class))))
+
+(defun auto-mark-mode-maybe ()
+  (if (not (minibufferp (current-buffer)))
+      (auto-mark-mode 1)))
+
+(require 'easy-mmode)
+
+(define-minor-mode auto-mark-mode
+  "AutoMark mode."
+  :group 'auto-mark
+  (if auto-mark-mode
+      (progn
+        (make-local-variable 'auto-mark-previous-buffer-size)
+        (make-local-variable 'auto-mark-previous-point)
+        (make-local-variable 'auto-mark-command-class)
+        (setq auto-mark-previous-buffer-size 0
+              auto-mark-previous-point (point-min)
+              auto-mark-command-class nil)
+        (add-hook 'pre-command-hook 'auto-mark-pre-command-handle nil t)
+        (add-hook 'post-command-hook 'auto-mark-post-command-handle nil t))
+    (remove-hook 'pre-command-hook 'auto-mark-pre-command-handle t)
+    (remove-hook 'post-command-hook 'auto-mark-post-command-handle t)))
+
+(define-global-minor-mode global-auto-mark-mode
+  auto-mark-mode auto-mark-mode-maybe
+  :group 'auto-mark)
+
+(provide 'auto-mark)
+;;; auto-mark.el ends here
+#+end_src
+
+https://www.emacswiki.org/emacs/MakingMarkVisible
+#+begin_src emacs-lisp
+;;;; Make the mark visible, and the visibility toggleable. ('mmv' means 'make
+;;;; mark visible'.) By Patrick Gundlach, Teemu Leisti, and Stefan.
+
+(defface mmv-face
+  '((t :background "maroon2" :foreground "white"))
+  "Face used for showing the mark's position.")
+
+(defvar-local mmv-mark-overlay nil
+  "The overlay for showing the mark's position.")
+
+(defvar-local mmv-is-mark-visible t
+  "The overlay is visible only when this variable's value is t.")
+
+(defun mmv-draw-mark (&rest _)
+  "Make the mark's position stand out by means of a one-character-long overlay.
+   If the value of variable `mmv-is-mark-visible' is nil, the mark will be
+   invisible."
+  (unless mmv-mark-overlay
+    (setq mmv-mark-overlay (make-overlay 0 0 nil t))
+    (overlay-put mmv-mark-overlay 'face 'mmv-face))
+  (let ((mark-position (mark t)))
+    (cond
+     ((null mark-position) (delete-overlay mmv-mark-overlay))
+     ((and (< mark-position (point-max))
+           (not (eq ?\n (char-after mark-position))))
+      (overlay-put mmv-mark-overlay 'after-string nil)
+      (move-overlay mmv-mark-overlay mark-position (1+ mark-position)))
+     (t
+      ; This branch is called when the mark is at the end of a line or at the
+      ; end of the buffer. We use a bit of trickery to avoid the higlight
+      ; extending from the mark all the way to the right end of the frame.
+      (overlay-put mmv-mark-overlay 'after-string
+                   (propertize " " 'face (overlay-get mmv-mark-overlay 'face)))
+      (move-overlay mmv-mark-overlay mark-position mark-position)))))
+
+;; (add-hook 'pre-redisplay-functions #'mmv-draw-mark)
+
+(defun mmv-toggle-mark-visibility ()
+  "Toggles the mark's visiblity and redraws it (whether invisible or visible)."
+  (interactive)
+  (setq mmv-is-mark-visible (not mmv-is-mark-visible))
+  (if mmv-is-mark-visible
+      (set-face-attribute 'mmv-face nil :background "maroon2" :foreground "white")
+    (set-face-attribute 'mmv-face nil :background 'unspecified :foreground 'unspecified))
+  (mmv-draw-mark))
+#+end_src
+
+*** Config
+#+begin_src emacs-lisp
+(when (require 'auto-mark nil t)
+  (setq auto-mark-command-class-alist
+        '((anything . anything)
+          (goto-line . jump)
+          (centaur-tabs-forward . edit)
+          (centaur-tabs-backward . edit)
+          (magit-status . edit)
+          (counsel-find-file . edit)
+          (doom/switch-to-scratch-buffer . edit)
+          (indent-for-tab-command . ignore)
+          (undo . ignore)))
+  (setq auto-mark-command-classifiers
+        (list (lambda (command)
+                (if (and (eq command 'self-insert-command)
+                         (eq last-command-char ? ))
+                    'ignore))))
+  (global-auto-mark-mode 1))
+#+end_src
+
+** Magit
+
+*** magit-status-here
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-x g") 'magit-status-here)
+#+end_src
+
+*** magit-gitflow
+#+begin_src emacs-lisp
+(setq magit-gitflow-popup-key "C-c m f")
+#+end_src
+
+** Git auto commit
+#+begin_src emacs-lisp
+(use-package! git-auto-commit-mode
+  :config
+  ;;(setq shell-command-prompt-show-cwd t)
+  (setq-default gac-automatically-push-p t)
+  (setq-default gac-debounce-interval 120)
+)
+#+end_src
+
+** flyspell-correct
+https://github.com/d12frosted/flyspell-correct
+
+#+begin_src emacs-lisp
+
+#+end_src
+
+
+
+#+begin_src emacs-lisp
+;(define-key flyspell-mode-map (kbd "C-;") #'flyspell-correct-wrapper)
+#+end_src
+
+#+begin_src emacs-lisp
+;; (use-package! flyspell-correct-ivy
+;;   :after flyspell-correct)
+#+end_src
+
+** Workspace
+https://discourse.doomemacs.org/t/permanently-display-workspaces-in-minibuffer/84
+#+begin_src emacs-lisp
+(after! persp-mode
+  (defun display-workspaces-in-minibuffer ()
+    (with-current-buffer " *Minibuf-0*"
+      (erase-buffer)
+      (insert (+workspace--tabline))))
+  (run-with-idle-timer 1 t #'display-workspaces-in-minibuffer)
+  (+workspace/display)
+  (map! "C-x k" #'persp-remove-buffer
+        "C-x K" #'persp-kill-buffer
+        "C-q C-w" #'+workspace/switch-to)
+
+  ;; https://github.com/doomemacs/doomemacs/issues/1189
+  (remove-hook 'persp-add-buffer-on-after-change-major-mode-filter-functions #'doom-unreal-buffer-p)
+)
+#+end_src
+#+begin_src emacs-lisp
+(setq +ivy-buffer-preview 't)
+(map!
+ (:when (modulep! :completion ivy)
+       (:after ivy
+        :map ivy-minibuffer-map
+        "C-SPC" #'ivy-call-and-recenter  ; preview file
+        )
+       (:after counsel
+        :map counsel-ag-map
+        "C-SPC"    #'ivy-call-and-recenter ; preview
+       ))
+ (:when (modulep! :completion vertico)
+        (:after vertico
+         :map vertico-map
+         "C-SPC" #'+vertico/embark-preview
+         ))
+)
+#+end_src
+
+** projectile
+#+begin_src emacs-lisp
+(setq projectile-sort-order 'recently-active)
+#+end_src
+
+** repeat mode
+#+begin_src emacs-lisp
+(repeat-mode 1)
+(setq repeat-exit-timeout 5)
+
+(after! (:and centaur-tabs persp-mode)
+  (defalias 'ctrl-q-keymap (make-sparse-keymap))
+  (defvar ctrl-q-map (symbol-function 'ctrl-q-keymap))
+  (define-key global-map "\C-q" 'ctrl-q-keymap)
+
+  (define-key ctrl-q-map "\C-h" 'centaur-tabs-backward)
+  (define-key ctrl-q-map "\C-l" 'centaur-tabs-forward)
+  (define-key ctrl-q-map "h" 'centaur-tabs-backward)
+  (define-key ctrl-q-map "l" 'centaur-tabs-forward)
+  (define-key ctrl-q-map "k" 'centaur-tabs-move-current-tab-to-right)
+  (define-key ctrl-q-map "j" 'centaur-tabs-move-current-tab-to-left)
+
+  (put 'centaur-tabs-forward 'repeat-map 'ctrl-q-map)
+  (put 'centaur-tabs-backward 'repeat-map 'ctrl-q-map)
+  (put 'centaur-tabs-move-current-tab-to-right 'repeat-map 'ctrl-q-map)
+  (put 'centaur-tabs-move-current-tab-to-left 'repeat-map 'ctrl-q-map)
+  (put 'mc/mark-next-like-this 'repeat-map 'doom-leader-multiple-cursors-map)
+  (put 'mc/unmark-next-like-this 'repeat-map 'doom-leader-multiple-cursors-map)
+  (put 'mc/mark-previous-like-this 'repeat-map 'doom-leader-multiple-cursors-map)
+  (put 'mc/unmark-previous-like-this 'repeat-map 'doom-leader-multiple-cursors-map)
+
+  (define-key ctrl-q-map "c" 'tab-new)
+  (define-key ctrl-q-map "\C-c" 'centaur-tabs--create-new-empty-buffer)
+  (define-key ctrl-q-map "\C-w" '+workspace/switch-to)
+)
+#+end_src
+
+** god mode
+#+begin_src emacs-lisp
+(after! god-mode
+  (global-set-key (kbd "<escape> <escape> <escape>") #'god-local-mode)
+  (global-set-key (kbd "<escape> q") #'god-local-mode)
+  (define-key god-local-mode-map (kbd "i") #'god-local-mode)
+  (define-key god-local-mode-map (kbd "z") #'repeat)
+  (define-key god-local-mode-map (kbd ".") #'repeat)
+  ;(define-key god-local-mode-map (kbd "C-x C-SPC") #'pop-global-mark)
+  ;(define-key god-local-mode-map (kbd "u SPC") #'pop-global-mark)
+)
+#+end_src
+
+* Org                                                                           :org:
+** Org settings from purcell
+#+begin_src emacs-lisp
+(after! org
+;; Various preferences
+(setq org-log-done t
+      org-log-into-drawer t
+      org-edit-timestamp-down-means-later t
+      org-hide-emphasis-markers t
+      org-catch-invisible-edits 'show
+      org-export-coding-system 'utf-8
+      org-fast-tag-selection-single-key 'expert
+      org-html-validation-link nil
+      org-export-kill-product-buffer-when-displayed t
+      org-tags-column 80)
+
+(setq org-support-shift-select t)
+(setq org-refile-use-cache nil)
+)
+
+;; Re-align tags when window shape changes
+(after! 'org-agenda
+  (add-hook 'org-agenda-mode-hook
+            (lambda () (add-hook 'window-configuration-change-hook 'org-agenda-align-tags nil t))))
+
+(after! org
+;;; To-do settings
+;; (setq org-todo-keywords
+;;       (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!/!)")
+;;               (sequence "PROJECT(p)" "|" "DONE(d!/!)" "CANCELLED(c@/!)")
+;;               (sequence "WAITING(w@/!)" "DELEGATED(e!)" "HOLD(h)" "|" "CANCELLED(c@/!)")))
+;;       org-todo-repeat-to-state "NEXT")
+
+;; (setq org-todo-keyword-faces
+;;       (quote (("NEXT" :inherit warning)
+;;               ("PROJECT" :inherit font-lock-string-face))))
+
+(setq-default org-agenda-clockreport-parameter-plist '(:link t :maxlevel 4))
+
+
+;; (let ((active-project-match "-INBOX/PROJECT"))
+
+;;   (setq org-stuck-projects
+;;         `(,active-project-match ("NEXT")))
+
+;;   (setq org-agenda-compact-blocks t
+;;         org-agenda-sticky t
+;;         org-agenda-start-on-weekday nil
+;;         org-agenda-span 'day
+;;         org-agenda-include-diary nil
+;;         org-agenda-sorting-strategy
+;;         '((agenda habit-down time-up user-defined-up effort-up category-keep)
+;;           (todo category-up effort-up)
+;;           (tags category-up effort-up)
+;;           (search category-up))
+;;         org-agenda-window-setup 'current-window
+;;         org-agenda-custom-commands
+;;         `(("N" "Notes" tags "NOTE"
+;;            ((org-agenda-overriding-header "Notes")
+;;             (org-tags-match-list-sublevels t)))
+;;           ("g" "GTD"
+;;            ((agenda "" nil)
+;;             (tags "INBOX"
+;;                   ((org-agenda-overriding-header "Inbox")
+;;                    (org-tags-match-list-sublevels nil)))
+;;             (stuck ""
+;;                    ((org-agenda-overriding-header "Stuck Projects")
+;;                     (org-agenda-tags-todo-honor-ignore-options t)
+;;                     (org-tags-match-list-sublevels t)
+;;                     (org-agenda-todo-ignore-scheduled 'future)))
+;;             (tags-todo "-INBOX"
+;;                        ((org-agenda-overriding-header "Next Actions")
+;;                         (org-agenda-tags-todo-honor-ignore-options t)
+;;                         (org-agenda-todo-ignore-scheduled 'future)
+;;                         (org-agenda-skip-function
+;;                          '(lambda ()
+;;                             (or (org-agenda-skip-subtree-if 'todo '("HOLD" "WAITING"))
+;;                                 (org-agenda-skip-entry-if 'nottodo '("NEXT")))))
+;;                         (org-tags-match-list-sublevels t)
+;;                         (org-agenda-sorting-strategy
+;;                          '(todo-state-down effort-up category-keep))))
+;;             (tags-todo ,active-project-match
+;;                        ((org-agenda-overriding-header "Projects")
+;;                         (org-tags-match-list-sublevels t)
+;;                         (org-agenda-sorting-strategy
+;;                          '(category-keep))))
+;;             (tags-todo "-INBOX/-NEXT"
+;;                        ((org-agenda-overriding-header "Orphaned Tasks")
+;;                         (org-agenda-tags-todo-honor-ignore-options t)
+;;                         (org-agenda-todo-ignore-scheduled 'future)
+;;                         (org-agenda-skip-function
+;;                          '(lambda ()
+;;                             (or (org-agenda-skip-subtree-if 'todo '("PROJECT" "HOLD" "WAITING" "DELEGATED"))
+;;                                 (org-agenda-skip-subtree-if 'nottododo '("TODO")))))
+;;                         (org-tags-match-list-sublevels t)
+;;                         (org-agenda-sorting-strategy
+;;                          '(category-keep))))
+;;             (tags-todo "/WAITING"
+;;                        ((org-agenda-overriding-header "Waiting")
+;;                         (org-agenda-tags-todo-honor-ignore-options t)
+;;                         (org-agenda-todo-ignore-scheduled 'future)
+;;                         (org-agenda-sorting-strategy
+;;                          '(category-keep))))
+;;             (tags-todo "/DELEGATED"
+;;                        ((org-agenda-overriding-header "Delegated")
+;;                         (org-agenda-tags-todo-honor-ignore-options t)
+;;                         (org-agenda-todo-ignore-scheduled 'future)
+;;                         (org-agenda-sorting-strategy
+;;                          '(category-keep))))
+;;             (tags-todo "-INBOX"
+;;                        ((org-agenda-overriding-header "On Hold")
+;;                         (org-agenda-skip-function
+;;                          '(lambda ()
+;;                             (or (org-agenda-skip-subtree-if 'todo '("WAITING"))
+;;                                 (org-agenda-skip-entry-if 'nottodo '("HOLD")))))
+;;                         (org-tags-match-list-sublevels nil)
+;;                         (org-agenda-sorting-strategy
+;;                          '(category-keep))))
+;;             ;; (tags-todo "-NEXT"
+;;             ;;            ((org-agenda-overriding-header "All other TODOs")
+;;             ;;             (org-match-list-sublevels t)))
+;;             )))))
+)
+
+(add-hook 'org-agenda-mode-hook 'hl-line-mode)
+
+;;; Archiving
+(after! org
+(setq org-archive-mark-done nil)
+(setq org-archive-location "%s_archive::* Archive")
+)
+#+end_src
+** Org capture template
+https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/
+#+begin_src emacs-lisp
+(after! org
+  (setq org-capture-templates
+        (append '(("1" "Tru's Entry")
+                  ("1t" "todo" entry (file "~/Dropbox/Org/inbox.org")
+                   "* TODO %?\n%U\n" :clock-resume t)
+                  ("1n" "note" entry (file "~/Dropbox/Org/notes.org")
+                   "* %? :NOTE:\n%U\n%a\n" :clock-resume t)
+        )
+        org-capture-templates))
+)
+#+end_src
+
+** org-mode automatically wrap lines
+#+begin_src emacs-lisp
+(after! org
+(visual-line-mode 1))
+#+end_src
+
+** Org note file
+#+BEGIN_SRC emacs-lisp
+(after! org
+  (setq org-default-notes-file "~/Dropbox/Org/inbox.org"))
+#+END_SRC
+
+** Org Agenda File
+#+BEGIN_SRC emacs-lisp
+(after! org
+  (setq org-agenda-files "~/Dropbox/Apps/org-agenda/agenda_files"))
+#+END_SRC
+
+** org refile targets
+#+begin_src emacs-lisp
+(after! org
+  ;;(setq org-refile-targets '((nil :maxlevel . 3) (org-agenda-files :maxlevel . 3)))
+  (add-to-list 'org-refile-targets '("~/Dropbox/Org/org-roam/study/20220605052908-capture.org"  :maxlevel . 3))
+)
+#+end_src
+
+** Org Capture for alfred
+   https://github.com/ifitzpat/org-capture-popclip-extension/blob/master/el/alfred-org-capture.el
+
+   #+BEGIN_SRC emacs-lisp
+     (defvar org-mac-context nil)
+
+     ;;; Use org-mac to get link context and insert it to the captured item
+     (add-hook 'org-capture-prepare-finalize-hook
+               (lambda ()
+                 (when (equal
+                        (cdr (assoc 'name (frame-parameters (selected-frame))))
+                        "remember")
+                   (progn
+                     (goto-char (point-max))
+                     (if org-mac-context
+                         (progn
+                           (insert (concat org-mac-context "\n"))
+                           (setq org-mac-context nil))
+                       nil)
+                     ;;(call-interactively 'org-mac-link-link)
+                     ))))
+
+     ;;; Delete frame when capture is done
+     (add-hook 'org-capture-after-finalize-hook
+               (lambda ()
+                 (when (equal
+                        (cdr (assoc 'name (frame-parameters (selected-frame))))
+                        "remember")
+                   (delete-frame))))
+
+     ;;; Code:
+     (defun make-orgcapture-frame (&optional mytext)
+       "Create a new frame and run org-capture."
+       (interactive)
+       (setq org-mac-context mytext)
+       (make-frame '((name . "remember") (width . 100) (height . 30)
+                     (top . 400) (left . 300)
+                     ))
+       (select-frame-by-name "remember")
+       (org-roam-node-insert-immediate))
+
+
+     ;;     (add-to-list 'default-frame-alist '(height . 39))
+     ;;     (add-to-list 'default-frame-alist '(width . 124))
+
+     ;; ;;; Code:
+     ;; ;;; https://github.com/jjasghar/alfred-org-capture
+     ;; (defun make-orgcapture-frame ()
+     ;;   "Create a new frame and run org-capture."
+     ;;   (interactive)
+     ;;   (make-frame '((name . "remember") (width . 124) (height . 39)
+     ;;                 (top . 400) (left . 300)
+     ;;                 (font . "Operator Mono SSm")
+     ;;                 ))
+     ;;   (select-frame-by-name "remember")
+     ;;   (org-capture))
+   #+END_SRC
+
+** Visit daily org file
+
+#+BEGIN_SRC emacs-lisp
+(defun tru/visit-my-org-daily ()
+  (interactive)
+  (find-file "~/Dropbox/Org/daily.org"))
+(global-set-key (kbd "<escape> <escape> d") 'tru/visit-my-org-daily)
+(defun tru/visit-my-org-inbox ()
+  (interactive)
+  (find-file "~/Dropbox/Org/inbox.org"))
+(global-set-key (kbd "<escape> <escape> i") 'tru/visit-my-org-inbox)
+(defun tru/visit-my-org-journal ()
+  (interactive)
+  (find-file "~/Dropbox/Org/journal.org"))
+(global-set-key (kbd "<escape> <escape> j") 'tru/visit-my-org-journal)
+#+END_SRC
+
+** Org ansi
+#+begin_src emacs-lisp
+
+;(require 'loadhist)
+;(file-dependents (feature-file 'cl))
+(require 'cl-lib)
+(defun tru/org-redisplay-ansi-export-blocks ()
+  "Refresh the display of ANSI text source blocks."
+  (interactive)
+  (org-element-map (org-element-parse-buffer) 'export-block
+    (lambda (export)
+      (when (equalp "ansi" (org-element-property :type export))
+        (let ((begin (org-element-property :begin export))
+              (end (org-element-property :end export)))
+          (ansi-color-apply-on-region begin end))))))
+
+(defun tru/org-redisplay-ansi-example-blocks ()
+  "Refresh the display of ANSI text source blocks."
+  (interactive)
+  (org-element-map (org-element-parse-buffer) 'example-block
+    (lambda (example)
+      (when (equalp "ansi" (org-element-property :switches example))
+        (let ((begin (org-element-property :begin example))
+              (end (org-element-property :end example)))
+          (ansi-color-apply-on-region begin end))))))
+
+(use-package! org
+  :defer t
+  :config
+  (add-to-list 'org-babel-after-execute-hook #'tru/org-redisplay-ansi-export-blocks)
+  (add-to-list 'org-babel-after-execute-hook #'tru/org-redisplay-ansi-example-blocks)
+  (org-babel-do-load-languages 'org-babel-load-languages '((shell . t)))
+)
+#+end_src
+
+example:
+#+begin_example
+;#+begin_src shell :results output verbatim drawer :wrap export ansi
+echo "\e[33mTest text\e[0m"
+echo Styles: '\e[3mitalic\e[0m' '\e[1mbold\e[0m' '\e[4munderline\e[0m' '\e[1m\e[3mbolditalics\e[0m'
+;#+end_src
+
+;#+RESULTS:
+;#+begin_export ansi
+Test text
+Styles: italic bold underline bolditalics
+;#+end_export
+#+end_example
+
+** Display preferences
+
+Make TAB act as if it were issued in a buffer of the language's major mode.
+
+#+BEGIN_SRC emacs-lisp
+(after! org
+(setq org-src-tab-acts-natively t))
+#+END_SRC
+
+When editing a code snippet, use the current window rather than popping open a
+new one (which shows the same information).
+
+#+BEGIN_SRC emacs-lisp
+(after! org
+(setq org-src-window-setup 'current-window))
+#+END_SRC
+
+Quickly insert a block of elisp:
+
+#+BEGIN_SRC emacs-lisp
+(after! org
+(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp")))
+#+END_SRC
+
+** Ob-async
+#+begin_src emacs-lisp
+(use-package! ob-async)
+#+end_src
+
+** Ob-tmux
+#+begin_src emacs-lisp
+(use-package! ob-tmux)
+#+end_src
+
+** Org-rifle
+#+begin_src emacs-lisp
+(use-package! helm-org-rifle)
+#+end_src
+
+** Org clock zone color
+https://emacs-china.org/t/org-agenda/8679
+
+#+begin_src emacs-lisp
+(defun my:org-agenda-time-grid-spacing ()
+  "Set different line spacing w.r.t. time duration."
+  (save-excursion
+    (let* ((background (alist-get 'background-mode (frame-parameters)))
+           (background-dark-p (string= background "dark"))
+           (colors (if background-dark-p
+                       (list "#aa557f" "DarkGreen" "DarkSlateGray" "DarkSlateBlue")
+                     (list "#F6B1C3" "#FFFF9D" "#BEEB9F" "#ADD5F7")))
+           pos
+           duration)
+      (nconc colors colors)
+      (goto-char (point-min))
+      (while (setq pos (next-single-property-change (point) 'duration))
+        (goto-char pos)
+        (when (and (not (equal pos (point-at-eol)))
+                   (setq duration (org-get-at-bol 'duration)))
+          (let ((line-height (if (< duration 30) 1.0 (+ 0.5 (/ duration 60))))
+                (ov (make-overlay (point-at-bol) (1+ (point-at-eol)))))
+            (overlay-put ov 'face `(:background ,(car colors)
+                                                :foreground
+                                                ,(if background-dark-p "black" "white")))
+            (setq colors (cdr colors))
+            (overlay-put ov 'line-height line-height)
+            (overlay-put ov 'line-spacing (1- line-height))))))))
+
+(add-hook 'org-agenda-finalize-hook #'my:org-agenda-time-grid-spacing)
+#+end_src
+
+** Org babel
+Unset ~org-babel-execute-buffer~ keybinding
+because I thought its dangerous.
+#+begin_src emacs-lisp
+;  (define-key helm-org-rifle-occur-map "\C-c\C-v\C-b" nil)
+;  (define-key helm-org-rifle-occur-map "\C-c\C-vb" nil)
+  (define-key org-babel-map "\C-b" nil)
+  (define-key org-babel-map "b" nil)
+  (define-key org-mode-map "\C-c\C-v\C-b" nil)
+  (define-key org-mode-map "\C-c\C-vb" nil)
+#+end_src
+
+** Org debug
+#+begin_src emacs-lisp
+;; debug
+(defun tru/tt-parse-buff ()
+  "2019-01-14"
+  (interactive)
+  (let ((tt (org-element-parse-buffer )))
+    (with-output-to-temp-buffer "*xah temp out*"
+      (print tt))))
+
+(defun tru/tt-headline ()
+  "2019-01-14"
+  (interactive)
+  (let ((tt (org-element-parse-buffer 'headline )))
+    (with-output-to-temp-buffer "*xah temp out*"
+      (print tt))))
+
+#+end_src
+
+** Org table valign
+https://emacs-china.org/t/org-mode/13248
+
+#+begin_src emacs-lisp
+(use-package! valign)
+#+end_src
+
+** Org-roam
+
+#+begin_src emacs-lisp
+(setq org-roam-directory "/Users/tru/Dropbox/Org/org-roam/")
+(defun tru/org-roam-node-find-by-tag ()
+  (interactive)
+    (let ((chosen-tag
+    (completing-read "filter by tag: "
+       (seq-uniq
+        (org-roam-db-query
+         [:select [tag]
+           :from tags ])))))
+      (org-roam-node-find
+       nil
+       nil
+       (lambda (node) (member chosen-tag (org-roam-node-tags node))))))
+#+end_src
+
+#+begin_src emacs-lisp
+(setq org-roam-capture-templates
+      '(
+        ("w" "workstuff" plain (file "/Users/tru/Dropbox/Org/org-roam/templates/workstuff.org")
+         :target (file+head "work/%<%Y%m%d%H%M%S>-${slug}.org"
+                            "#+title: ${title}\n") :unnarrowed t)
+        ("r" "research" plain (file "/Users/tru/Dropbox/Org/org-roam/templates/research.org")
+         :target (file+head "study/%<%Y%m%d%H%M%S>-${slug}.org"
+                            "#+title: ${title}\n") :unnarrowed t)
+        )
+)
+#+end_src
+
+#+begin_src emacs-lisp
+  (after! org-roam
+  ;; https://systemcrafters.net/build-a-second-brain-in-emacs/5-org-roam-hacks/
+  ;; Bind this to C-c n I
+  (defun org-roam-node-insert-immediate (arg &rest args)
+    (interactive "P")
+    (let ((args (cons arg args))
+          (org-roam-capture-templates (list (append (car org-roam-capture-templates)
+                                                    '(:immediate-finish t)))))
+      (apply #'org-roam-node-insert args)))
+          )
+#+end_src
+
+#+begin_src emacs-lisp
+;;; Code:
+(defun make-orgcapture-frame (&optional mytext)
+  "Create a new frame and run org-capture."
+  (interactive)
+  (setq org-mac-context mytext)
+  (make-frame '((name . "remember") (width . 100) (height . 30)
+                (top . 400) (left . 300)
+                ))
+  (select-frame-by-name "remember")
+  (org-roam-node-insert-immediate))
+
+#+end_src
+
+*** org-roam-ui
+#+begin_src emacs-lisp
+(use-package! websocket
+    :after org-roam)
+
+(use-package! org-roam-ui
+    :after org-roam ;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+#+end_src
+
+** Org-mouse
+
+#+begin_src emacs-lisp
+(after! org
+  (setq org-modules
+        (append '(
+                  org-mouse
+                  )org-modules)))
+#+end_src
+
+** Org display a single inline image
+[[https://www.reddit.com/r/orgmode/comments/hx5keh/display_a_single_inline_image/][Display a single inline image : orgmode]]
+
+#+begin_src emacs-lisp
+;;(defun org-display-inline-images (&optional include-linked refresh beg end))
+#+end_src
+
+** +Org presentation+
+https://github.com/daviwil/dotfiles/blob/master/Emacs.org#presentations
+#+begin_src emacs-lisp :tangle no
+(defun dw/org-start-presentation ()
+  (interactive)
+  (org-tree-slide-mode 1)
+  (setq text-scale-mode-amount 1)
+  (text-scale-mode 1)
+  (global-tab-line-mode 0)
+  (tab-bar-mode 0))
+
+(defun dw/org-end-presentation ()
+  (interactive)
+  (text-scale-mode 0)
+  (org-tree-slide-mode 0)
+  (global-tab-line-mode 1)
+  (tab-bar-mode 1))
+
+(use-package! org-tree-slide
+  :after org
+  :functions (org-display-inline-images
+              org-remove-inline-images)
+  :bind (:map org-mode-map
+         ("<f8>" . dw/org-start-presentation)
+         :map org-tree-slide-mode-map
+         ("C-q" . dw/org-end-presentation)
+         ("<right>" . org-tree-slide-move-next-tree)
+         ("<left>" . org-tree-slide-move-previous-tree))
+  :config
+  (setq org-tree-slide-slide-in-effect nil
+        org-tree-slide-activate-message "Presentation started."
+        org-tree-slide-deactivate-message "Presentation ended."
+        org-tree-slide-header t
+        org-tree-slide-fold-subtrees-skipped nil
+        org-tree-slide-cursor-init nil))
+#+end_src
+
+#+begin_src emacs-lisp
+(defun dw/org-present-prepare-slide ()
+  (org-overview)
+  ;; (org-show-entry)
+  ;; (org-show-children)
+  )
+
+(defun dw/org-present-hook ()
+  (setq header-line-format " ")
+  (org-display-inline-images)
+  (dw/org-present-prepare-slide))
+
+(defun dw/org-present-quit-hook ()
+  (setq header-line-format nil)
+  (org-present-small)
+  (org-remove-inline-images))
+
+(defun dw/org-present-prev ()
+  (interactive)
+  (org-present-prev)
+  (dw/org-present-prepare-slide))
+
+(defun dw/org-present-next ()
+  (interactive)
+  (org-present-next)
+  (dw/org-present-prepare-slide))
+
+(use-package! org-present
+  :bind (:map org-present-mode-keymap
+         ("C-c C-j" . dw/org-present-next)
+         ("C-c C-k" . dw/org-present-prev))
+  :hook ((org-present-mode . dw/org-present-hook)
+         (org-present-mode-quit . dw/org-present-quit-hook)))
+#+end_src
+
+** Auto babel tangle
+#+begin_src emacs-lisp
+(after! org
+  (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t))
+#+end_src
+
+** Org auto tangle mode
+#+begin_src emacs-lisp
+(use-package! org-auto-tangle)
+(after! org
+  (add-hook 'org-mode-hook 'org-auto-tangle-mode)
+  (setq org-auto-tangle-default nil)
+)
+#+end_src
+
+** Org-toggle-emphasis
+https://stackoverflow.com/questions/10969617/hiding-markup-elements-in-org-mode
+
+#+begin_src emacs-lisp
+(defun tru/org-toggle-emphasis ()
+  "Toggle hiding/showing of org emphasize markers."
+  (interactive)
+  (if org-hide-emphasis-markers
+      (set-variable 'org-hide-emphasis-markers nil)
+    (set-variable 'org-hide-emphasis-markers t))
+  (org-mode-restart))
+#+end_src
+
+** +org-bars+
+#+begin_src emacs-lisp :tangle no
+(use-package! org-bars)
+;; (after! org
+;;   (add-hook 'org-mode-hook #'org-bars-mode))
+#+end_src
+
+** org-mac-link
+#+begin_src emacs-lisp
+(when IS-MAC
+  (use-package! org-mac-link
+    :after org
+    :config
+    (setq org-mac-grab-Acrobat-app-p nil) ; Disable grabbing from Adobe Acrobat
+    (setq org-mac-grab-devonthink-app-p nil) ; Disable grabbinb from DevonThink
+    (map! :map org-mode-map          "C-c g"  #'org-mac-link-link)))
+#+end_src
+
+* Tools
+** Email
+*** +mu4e+
+#+begin_src emacs-lisp :tangle no
+(require 'mu4e-contrib)
+(setq mu4e-html2text-command 'mu4e-shr2text)
+(setq mu4e-html2text-command "iconv -c -t utf-8 | pandoc -f html -t plain")
+(add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+#+end_src
+
+*** notmuch
+#+begin_src emacs-lisp
+(defun get-string-from-file (filePath)
+  "Return filePath's file content."
+  (with-temp-buffer
+    (insert-file-contents filePath)
+    (buffer-string)))
+
+(fset '+notmuch-view-in-mailapp
+   (kmacro-lambda-form [?\M-x ?n ?o ?t ?m ?u ?c ?h ?- ?s ?h ?o ?w ?- ?s ?t ?a ?s ?h ?- ?m ?e ?s ?s ?a ?g ?e ?- ?i ?d ?- ?s ?t ?r ?\C-m ?\C-\[ ?! ?o ?p ?e ?n ?  ?m ?e ?s ?s ?a ?g ?e ?: ?/ ?/ ?% ?3 ?C ?\C-y ?% ?3 ?E ?\C-  ?\C-a ?\M-w ?\C-m] 0 "%d"))
+
+(fset '+notmuch-view-in-gmail
+   (kmacro-lambda-form [?c ?F ?\M-x ?u ?r ?l ?m ?a ?c ?o ?s ?x return ?j ?j ?\C-  ?\C-a ?\C-d ?\C-y ?j ?j ?j ?\C-\M-b ?\C-\M-b ?\C-\M-b ?\C-\M-f ?\M-b ?\C-  ?\C-a ?\C-d ?\M-f ?\C-k ?\C-a ?h ?t ?t ?p ?s ?: ?/ ?/ ?m ?a ?i ?l ?. ?g ?o ?o ?g ?l ?e ?. ?c ?o ?m ?/ ?m ?a ?i ?l ?? ?# ?a ?l ?l ?/ ?\C-e return] 0 "%d"))
+#+end_src
+
+#+begin_src emacs-lisp
+;(mm-display-parts (mm-dissect-buffer))
+#+end_src
+
+#+begin_src emacs-lisp
+;; workaround multi database
+(when (string-match "work" (get-string-from-file "/Users/tru/Dropbox/Apps/org-agenda/.git/HEAD"))
+  (setenv "NOTMUCH_CONFIG" "/Users/tru/Dropbox/Apps/emacs/tru/notmuchmail/ubiquiti/notmuch.conf")
+  (setq +notmuch-mail-folder "~/Dropbox/Apps/emacs/tru/notmuchmail/ubiquiti"))
+(when (string-match "life" (get-string-from-file "/Users/tru/Dropbox/Apps/org-agenda/.git/HEAD"))
+  (setenv "NOTMUCH_CONFIG" "/Users/tru/Dropbox/Apps/emacs/tru/notmuchmail/tru.zhou/notmuch.conf")
+  (setq +notmuch-mail-folder "~/Dropbox/Apps/emacs/tru/notmuchmail/tru.zhou"))
+
+(after! notmuch
+  (setq mm-text-html-renderer 'w3m)
+  (setq w3m-fill-column 72)
+  (setq w3m-default-display-inline-images t)
+  (setq notmuch-message-headers-visible t)
+  (setq notmuch-saved-searches
+        '((:name "inbox"      :query "tag:inbox"                    :count-query "tag:inbox and tag:unread"                    :key "i")
+          (:name "personal"   :query "tag:inbox and tag:personal"   :count-query "tag:inbox and tag:unread and tag:personal"   :key "p")
+          (:name "social"     :query "tag:inbox and tag:social"     :count-query "tag:inbox and tag:unread and tag:social"     :key "o")
+          (:name "promotions" :query "tag:inbox and tag:promotions" :count-query "tag:inbox and tag:unread and tag:promotions" :key "r")
+          (:name "updates"    :query "tag:inbox and tag:updates"    :count-query "tag:inbox and tag:unread and tag:updates"    :key "u")
+          (:name "forums"     :query "tag:inbox and tag:forums"     :count-query "tag:inbox and tag:unread and tag:forums"     :key "f")
+
+          (:name "flagged" :query "tag:flagged" :key "s")
+          (:name "sent"    :query "tag:sent"    :key "e")
+          (:name "drafts"  :query "tag:draft"   :key "d")))
+  (defun =notmuch ()
+    "Activate (or switch to) `notmuch' in its workspace."
+    (interactive)
+
+    ;; workaround multi database
+    (when (string-match "work" (get-string-from-file "/Users/tru/Dropbox/Apps/org-agenda/.git/HEAD"))
+      (setenv "NOTMUCH_CONFIG" "/Users/tru/Dropbox/Apps/emacs/tru/notmuchmail/ubiquiti/notmuch.conf")
+      (setq +notmuch-mail-folder "~/Dropbox/Apps/emacs/tru/notmuchmail/ubiquiti"))
+    (when (string-match "life" (get-string-from-file "/Users/tru/Dropbox/Apps/org-agenda/.git/HEAD"))
+      (setenv "NOTMUCH_CONFIG" "/Users/tru/Dropbox/Apps/emacs/tru/notmuchmail/tru.zhou/notmuch.conf")
+      (setq +notmuch-mail-folder "~/Dropbox/Apps/emacs/tru/notmuchmail/tru.zhou"))
+    (unless (featurep! :ui workspaces)
+      (user-error ":ui workspaces is required, but disabled"))
+    (condition-case-unless-debug e
+        (progn
+          (+workspace-switch "*MAIL*" t)
+          (if-let* ((buf (cl-find-if (lambda (it) (string-match-p "^\\*notmuch" (buffer-name (window-buffer it))))
+                                     (doom-visible-windows))))
+              (select-window (get-buffer-window buf))
+            (notmuch-search "tag:inbox and tag:unread"))
+          (+workspace/display))
+      ('error
+       (+notmuch/quit)
+       (signal (car e) (cdr e)))))
+
+  (define-key notmuch-show-mode-map (kbd ". m") #'+notmuch-view-in-mailapp)
+  (define-key notmuch-show-mode-map (kbd ". g") #'+notmuch-view-in-gmail)
+
+  (defun tru/notmuch/update ()
+    (interactive)
+    ;; create output buffer and jump to beginning
+    (let ((buf (get-buffer-create "*notmuch update*")))
+      (with-current-buffer buf
+        (erase-buffer))
+      (pop-to-buffer buf nil t)
+      (set-process-sentinel
+       (start-process-shell-command
+        "notmuch update" buf
+        (pcase +notmuch-sync-backend
+          (`gmi
+           ;&& export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib/
+           (setenv "DYLD_FALLBACK_LIBRARY_PATH" "")
+           (concat "cd " +notmuch-mail-folder " && export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib:/usr/local/lib/ && gmi sync && gmi sync"))
+          (`custom +notmuch-sync-command)))
+       ;; refresh notmuch buffers if sync was successful
+       (lambda (_process event)
+         (if (string= event "finished\n")
+             (notmuch-refresh-all-buffers))))))
+
+  (map! :localleader
+        :map (notmuch-search-mode-map notmuch-tree-mode-map notmuch-show-mode-map)
+        ;; :desc "Compose email"   "c" #'+notmuch/compose
+        :desc "Sync email" "u" #'tru/notmuch/update
+        ;; :desc "Quit notmuch"    "q" #'+notmuch/quit
+        ;; :map notmuch-search-mode-map
+        ;; :desc "Mark as deleted" "d" #'+notmuch/search-delete
+        ;; :desc "Mark as spam"    "s" #'+notmuch/search-spam
+        ;; :map notmuch-tree-mode-map
+        ;; :desc "Mark as deleted" "d" #'+notmuch/tree-delete
+        ;; :desc "Mark as spam"    "s" #'+notmuch/tree-spam
+        )
+  )
+#+end_src
+
+#+begin_src emacs-lisp
+;; (use-package! notmuch-labeler
+;;   :commands notmuch-labeler-rename
+;;   :after notmuch
+;;   :defer nil
+;;   :config
+;;   (notmuch-labeler-rename "unread" "new" ':foreground "blue"))
+
+;; Inline images?
+(setq mm-attachment-override-types '("image/.*"))
+;; Or, like this:
+(add-to-list 'mm-attachment-override-types "image/.*")
+(setq w3m-default-display-inline-images t)
+
+(defun notmuch-view-html ()
+  "Open the HTML parts of a mail in a web browser."
+  (interactive)
+  (with-current-notmuch-show-message
+   (let ((mm-handle (mm-dissect-buffer)))
+     (notmuch-foreach-mime-part
+      (lambda (p)
+        (if (string-equal (mm-handle-media-type p) "text/html")
+            (mm-display-external p (lambda ()
+                                     (message "Opening web browser...")
+                                     (browse-url-of-buffer)
+                                     (bury-buffer)))))
+      mm-handle))))
+#+end_src
+
+#+begin_src emacs-lisp
+(defun tru/notmuch-show-toggle-message ()
+  (interactive)
+  (let ((url (thing-at-point 'url 'no-properties)))
+    (if url
+      (goto-address-at-point)
+      (notmuch-show-toggle-message))))
+#+end_src
+
+* Misc
+** TODO Auto-Correct Words
+
+  =void-function ispell-get-word=
+
+  http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
+  https://www.youtube.com/watch?v=fhI_riv_6HM
+
+  =brew install ispell=
+
+  #+BEGIN_SRC emacs-lisp
+    (setq ispell-program-name "/opt/homebrew/bin/ispell")
+
+    (define-key ctl-x-map "\C-i"
+      #'endless/ispell-word-then-abbrev)
+
+    (defun endless/simple-get-word ()
+      (car-safe (save-excursion (ispell-get-word nil))))
+
+    (defun endless/ispell-word-then-abbrev (p)
+      "Call `ispell-word', then create an abbrev for it.
+    With prefix P, create local abbrev. Otherwise it will
+    be global.
+    If there's nothing wrong with the word at point, keep
+    looking for a typo until the beginning of buffer. You can
+    skip typos you don't want to fix with `SPC', and you can
+    abort completely with `C-g'."
+      (interactive "P")
+      (let (bef aft)
+        (save-excursion
+          (while (if (setq bef (endless/simple-get-word))
+                     ;; Word was corrected or used quit.
+                     (if (ispell-word nil 'quiet)
+                         nil ; End the loop.
+                       ;; Also end if we reach `bob'.
+                       (not (bobp)))
+                   ;; If there's no word at point, keep looking
+                   ;; until `bob'.
+                   (not (bobp)))
+            (backward-word)
+            (backward-char))
+          (setq aft (endless/simple-get-word)))
+        (if (and aft bef (not (equal aft bef)))
+            (let ((aft (downcase aft))
+                  (bef (downcase bef)))
+              (define-abbrev
+                (if p local-abbrev-table global-abbrev-table)
+                bef aft)
+              (message "\"%s\" now expands to \"%s\" %sally"
+                       bef aft (if p "loc" "glob")))
+          (user-error "No typo at or before point"))))
+
+    (setq save-abbrevs 'silently)
+    (setq-default abbrev-mode t)
+  #+END_SRC
+  
