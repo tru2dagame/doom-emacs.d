@@ -1321,6 +1321,25 @@ https://discourse.doomemacs.org/t/permanently-display-workspaces-in-minibuffer/8
   (define-key god-local-mode-map (kbd ".") #'repeat)
   ;(define-key god-local-mode-map (kbd "C-x C-SPC") #'pop-global-mark)
   ;(define-key god-local-mode-map (kbd "u SPC") #'pop-global-mark)
+
+  (defun split-window-func-with-other-buffer (split-function)
+    (lexical-let ((s-f split-function))
+      (lambda ()
+        (interactive)
+        (funcall s-f)
+        (set-window-buffer (next-window) (other-buffer)))))
+
+  (global-set-key (kbd "C-x C-1") 'delete-other-windows)
+  (global-set-key (kbd "C-x C-o") 'other-window)
+  (global-set-key (kbd "C-x 2")   (split-window-func-with-other-buffer 'split-window-vertically))
+  (global-set-key (kbd "C-x C-2") (split-window-func-with-other-buffer 'split-window-vertically))
+  (global-set-key (kbd "C-x C--") (split-window-func-with-other-buffer 'split-window-vertically))
+  (global-set-key (kbd "C-x 3")   (split-window-func-with-other-buffer 'split-window-horizontally))
+  (global-set-key (kbd "C-x C-3") (split-window-func-with-other-buffer 'split-window-horizontally))
+  (global-set-key (kbd "C-x C-+") (split-window-func-with-other-buffer 'split-window-horizontally))
+
+  (define-key god-local-mode-map (kbd "O") 'spacer)
+  (defun spacer (times)  (interactive "p") (dotimes (x times) (insert " ")))
 )
 #+end_src
 
