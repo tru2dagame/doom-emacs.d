@@ -1,5 +1,9 @@
 ;;; init.el -*- lexical-binding: t; -*-
 
+;; Emacs 29+ ships Docker TRAMP as tramp-container; avoid loading obsolete
+;; docker-tramp autoloads from Doom's older :tools docker module.
+(setq doom-autoloads-excluded-packages '(docker-tramp "docker-tramp"))
+
 ;; This file controls what Doom modules are enabled and what order they load
 ;; in. Remember to run 'doom sync' after modifying it!
 
@@ -22,12 +26,13 @@
        ;;layout            ; auie,ctsrnm is the superior home row
 
        :completion
-       company           ; the ultimate code completion backend
+       (company            ; the ultimate code completion backend
+        +childframe)
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
-       (vertico           ; the search engine of the future
-         ;; +childframe
-         +icons)
+       ;;(vertico           ; the search engine of the future
+       ;;  ;; +childframe
+       ;;  +icons)
        (ivy               ; a search engine for love and life
          ;; +fuzzy            ; https://github.com/hlissner/doom-emacs/tree/develop/modules/completion/ivy
          ;; +childframe
@@ -35,7 +40,7 @@
        :ui
        ;;deft              ; notational velocity for Emacs
        doom              ; what makes DOOM look the way it does
-       doom-dashboard    ; a nifty splash screen for Emacs
+       dashboard         ; a nifty splash screen for Emacs
        ;;(emoji +unicode)  ; 🙂
        doom-quit         ; DOOM quit-message prompts when you quit Emacs
        hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
@@ -65,7 +70,7 @@
        file-templates    ; auto-snippets for empty files
        fold              ; (nigh) universal code folding
        ;;(format +onsave)  ; automated prettiness
-       god               ; run Emacs commands without modifier keys
+       ;;god               ; run Emacs commands without modifier keys
        ;;lispy             ; vim for lisp, for people who don't like vim
        multiple-cursors  ; editing in many places at once
        ;;objed             ; text object editing for the innocent
@@ -118,7 +123,7 @@
        ;;taskrunner        ; taskrunner for all your projects
        ;;tree-sitter       ; syntax and parsing, sitting in a tree...
        rgb               ; creating color strings
-       terraform         ; infrastructure as code
+       (terraform +lsp)         ; infrastructure as code
        tmux              ; an API for interacting with tmux
        ;;upload            ; map local to remote projects via ssh/ftp
 
@@ -171,7 +176,7 @@
                           ; https://github.com/doomemacs/doomemacs/tree/master/modules/lang/org
         +contacts
         ;; +passwords
-        +roam2
+        +roam
         +dragndrop       ; drag & drop files/images into org buffers
         +hugo            ; use Emacs for hugo blogging
         +pandoc          ; export-with-pandoc support
@@ -212,7 +217,7 @@
        ;;everywhere        ; *leave* Emacs!? You must be joking
        calendar
        ;;irc               ; how neckbeards socialize
-       ;;(rss +org)        ; emacs as an RSS reader
+       (rss +org)        ; emacs as an RSS reader
        ;;twitter           ; twitter client https://twitter.com/vnought
 
        :config

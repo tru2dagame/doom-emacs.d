@@ -1,3 +1,4 @@
+# -*- buffer-read-only: t; -*-
 #+TITLE: Config
 #+AUTHOR: Tru Zhou
 #+STARTUP: show2levels
@@ -30,6 +31,7 @@
   - [[#display-line-number][Display Line Number]]
   - [[#display-ansi-color][Display ansi color]]
   - [[#frame-size][Frame size]]
+  - [[#rainbow-mode-rgb][rainbow-mode (rgb)]]
 - [[#macos][macOS]]
   - [[#define-const-is-a-mac][Define const =is-a-mac=]]
   - [[#keybindings][Keybindings]]
@@ -65,6 +67,9 @@
   - [[#projectile][projectile]]
   - [[#repeat-mode][repeat mode]]
   - [[#god-mode][god mode]]
+  - [[#emamux][emamux]]
+  - [[#fzfel][fzf.el]]
+  - [[#github-copilotel][GitHub Copilot.el]]
 - [[#org][Org]]
   - [[#org-settings-from-purcell][Org settings from purcell]]
   - [[#org-capture-template][Org capture template]]
@@ -97,8 +102,8 @@
   - [[#email][Email]]
     - [[#mu4e][+mu4e+]]
     - [[#notmuch][notmuch]]
-- [[#misc][Misc]]
   - [[#auto-correct-words][Auto-Correct Words]]
+- [[#misc][Misc]]
 
 * Doom default config
 #+begin_src emacs-lisp
@@ -129,8 +134,8 @@
 ;;(set-face-attribute 'default nil :family "Operator Mono SSm Lig" :weight 'normal)
 ;(setq doom-font (font-spec :family "Operator Mono SSm Lig" :weight 'normal :size 20))
 (setq doom-font (font-spec :family "MesloLGS NF" :weight 'normal :size 20)
-      doom-variable-pitch-font (font-spec :family "MesloLGS NF" :size 20))
-(setq doom-unicode-font doom-font)
+      doom-variable-pitch-font (font-spec :family "MesloLGS NF" :size 20)
+      doom-symbol-font (font-spec :family "Apple Symbols"))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
@@ -190,38 +195,26 @@
 
 
 #+begin_src emacs-lisp
-(defun doom-dashboard-draw-ascii-emacs-banner-fn ()
-  (let* ((banner
-          '(
-"           _____"
-"         ===///    , ,-. ,-   .-, , , ,-  ,_  ,  ,_ ,-"
-"         --///    /_ |_/ _)  /''|/|/ |_] /=_ /_ /=_ _)"
-"       ___///    __    __  __  ______  ____    ___"
-"         ///  --/||  --// .'   //  '/ _//  )) (|  '/"
-"     ---///   /' ||  _//.;  __//_.    //_=''  _\\"
-"     --///- -/---||  //'||   //  ', _//  ;|     \\     ;"
-" _____/// __/_  _||_/<  `||_//__'/ _// --|\ /-._//    /"
-"    _///      ,                        ---\\\       .'"
-" ___///_____'/                              `;=__.-'"
-" "
-" "
+(defun tru/doom-dashboard-ascii-banner ()
+  (propertize
+   (mapconcat
+    #'identity
+    '("           _____"
+      "         ===///    , ,-. ,-   .-, , , ,-  ,_  ,  ,_ ,-"
+      "         --///    /_ |_/ _)  /''|/|/ |_] /=_ /_ /=_ _)"
+      "       ___///    __    __  __  ______  ____    ___"
+      "         ///  --/||  --// .'   //  '/ _//  )) (|  '/"
+      "     ---///   /' ||  _//.;  __//_.    //_=''  _\\\\"
+      "     --///- -/---||  //'||   //  ', _//  ;|     \\\\     ;"
+      " _____/// __/_  _||_/<  `||_//__'/ _// --|\\ /-._//    /"
+      "    _///      ,                        ---\\\\\\       .'"
+      " ___///_____'/                              `;=__.-'")
+    "\n")
+   'face '+dashboard-banner))
 
-))
-         (longest-line (apply #'max (mapcar #'length banner))))
-    (put-text-property
-     (point)
-     (dolist (line banner (point))
-       (insert (+doom-dashboard--center
-                +doom-dashboard--width
-                (concat
-                 line (make-string (max 0 (- longest-line (length line)))
-                                   32)))
-               "\n"))
-     'face 'doom-dashboard-banner)))
-
-(unless (display-graphic-p) ; for some reason this messes up the graphical splash screen atm
-  (setq +doom-dashboard-ascii-banner-fn #'doom-dashboard-draw-ascii-emacs-banner-fn))
-(setq +doom-dashboard-ascii-banner-fn #'doom-dashboard-draw-ascii-emacs-banner-fn)
+(setq fancy-splash-image 'ascii
+      +dashboard-banner-file nil
+      +dashboard-ascii-banner-fn #'tru/doom-dashboard-ascii-banner)
 #+end_src
 
 #+begin_src emacs-lisp :tangle no
@@ -317,8 +310,8 @@
   (global-set-key (kbd "C-s-f") 'centaur-tabs-move-current-tab-to-right)
   (global-set-key (kbd "C-s-b") 'centaur-tabs-move-current-tab-to-left)
 
-  (centaur-tabs-enable-buffer-reordering)
-  (setq centaur-tabs-adjust-buffer-order 'left)
+  ;(centaur-tabs-enable-buffer-reordering)
+  ;(setq centaur-tabs-adjust-buffer-order 'left)
 
 ;; https://github.com/ema2159/centaur-tabs/issues/113
 ;; https://github.com/ema2159/centaur-tabs/issues/34
@@ -328,6 +321,33 @@
 (setq uniquify-buffer-name-style 'forward)
 (setq uniquify-after-kill-buffer-p t)
 
+;; (defun my-centaur-tabs-hide-tab (tab)
+;;   "Hide TAB if there are more than 5 tabs."
+;;   (let ((tab-buffer (centaur-tabs-tab-value tab)))
+;;     (when (and (stringp tab-buffer)
+;;                (not (string-match-p "*.*" tab-buffer))
+;;                (> (length (centaur-tabs-tabs)) 5))
+;;       (centaur-tabs-hide-tab tab))))
+;; ;(add-hook 'centaur-tabs-select-hook 'my-centaur-tabs-hide-tab)
+
+;; (defun my-centaur-tabs-only-show-recent-tabs ()
+;;   "Show only the recent 5 tabs and move the current tab to the leftmost."
+;;   (let* ((tabs (centaur-tabs-tabs))
+;;          (current-tab (centaur-tabs-current-tab))
+;;          (current-index (cl-position current-tab tabs))
+;;          (num-tabs (length tabs)))
+;;     (when (> num-tabs 5)
+;;       (cl-loop for i from 0 to (- num-tabs 6)
+;;                do (centaur-tabs-hide-tab (nth (+ i current-index) tabs)))
+;;       (centaur-tabs-move-current-tab-to-left))))
+
+;; (add-hook 'centaur-tabs-select-hook 'my-centaur-tabs-only-show-recent-tabs)
+
+
+)
+#+end_src
+
+#+begin_src emacs-lisp
 ;; https://emacs-china.org/t/emacs-vscode-tab/18011/69
 (defun wd/get-buffer-persp-group (buffer)
     (let* ((name))
@@ -367,7 +387,7 @@
          "Other"
          )
        )))))
-)
+
 #+end_src
 
 *** tab-bar
@@ -379,7 +399,6 @@
 ;; (define-key global-map (kbd "C-<tab>") nil)
 ;; (global-set-key (kbd "C-<tab>") 'tab-line-switch-to-next-tab)
 ;; (global-set-key (kbd "C-S-<tab>") 'tab-line-switch-to-prev-tab)
-(tab-bar-mode 1)
 ;(setq tab-bar-new-tab-choice "*doom*")
 (global-set-key (kbd "C-<tab>") 'tab-bar-switch-to-next-tab)
 (global-set-key (kbd "C-S-<tab>") 'tab-bar-switch-to-prev-tab)
@@ -394,6 +413,13 @@
 ;(global-set-key (kbd "C-q C-w") 'tab-switch)
 (global-set-key (kbd "C-q c") 'tab-new)
 ;;(global-set-key (kbd "C-q C-q RET") 'tab-bar-select-tab-by-name)
+
+
+(custom-set-faces
+ '(tab-bar ((t (:background "#282c34" :foreground "#abb2bf" :height 1.2))))
+ '(tab-bar-tab ((t (:background "#282c34" :foreground "#abb2bf" :box nil :underline nil))))
+ '(tab-bar-tab-inactive ((t (:background "#282c34" :foreground "#5c6370" :box nil :underline nil)))))
+(tab-bar-mode 1)
 #+end_src
 
 https://emacs.stackexchange.com/questions/64473/using-tab-bar-el-with-automatic-tab-management
@@ -706,6 +732,38 @@ https://www.reddit.com/r/emacs/comments/jc4uou/tags_everywhere/
 ;(setq window-safe-min-height 18)
 #+end_src
 
+#+begin_src emacs-lisp
+(defun toggle-window-split ()
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+         (next-win-buffer (window-buffer (next-window)))
+         (this-win-edges (window-edges (selected-window)))
+         (next-win-edges (window-edges (next-window)))
+         (this-win-2nd (not (and (<= (car this-win-edges)
+                     (car next-win-edges))
+                     (<= (cadr this-win-edges)
+                     (cadr next-win-edges)))))
+         (splitter
+          (if (= (car this-win-edges)
+             (car (window-edges (next-window))))
+          'split-window-horizontally
+        'split-window-vertically)))
+    (delete-other-windows)
+    (let ((first-win (selected-window)))
+      (funcall splitter)
+      (if this-win-2nd (other-window 1))
+      (set-window-buffer (selected-window) this-win-buffer)
+      (set-window-buffer (next-window) next-win-buffer)
+      (select-window first-win)
+      (if this-win-2nd (other-window 1))))))
+
+(define-key ctl-x-map "=" 'toggle-window-split)
+(define-key ctl-x-map "C-=" 'toggle-window-split)
+#+end_src
+
+
+
 helm window size
 
 #+begin_src emacs-lisp
@@ -751,6 +809,12 @@ helm window size
 (add-to-list 'default-frame-alist '(width . 153))
 ;(add-to-list 'default-frame-alist '(top . 10))
 ;(add-to-list 'default-frame-alist '(top . 81))
+#+end_src
+
+** rainbow-mode (rgb)
+#+begin_src emacs-lisp
+(add-hook! 'rainbow-mode-hook
+  (hl-line-mode (if rainbow-mode -1 +1)))
 #+end_src
 
 * macOS
@@ -811,7 +875,7 @@ helm window size
 (defun tru/visit-custom-dotzshrc ()
   (interactive)
   (find-file (concat (getenv "TRU_D") "/Dev/configs/zshrc.d/README.org")))
-(global-set-key (kbd "<escape> <escape> z") 'tru/visit-custom-dotzshrc)
+(global-set-key (kbd "ESC ESC z") 'tru/visit-custom-dotzshrc)
 #+end_src
 
 *** zsh custom functions
@@ -819,7 +883,7 @@ helm window size
 (defun tru/visit-custom-functions ()
   (interactive)
   (find-file (concat (getenv "GHQ_PATH") "/github.com/Ubiquiti-UID/uid.literate-devops/README.org")))
-(global-set-key (kbd "<escape> <escape> f") 'tru/visit-custom-functions)
+(global-set-key (kbd "ESC ESC f") 'tru/visit-custom-functions)
 #+end_src
 
 ** org-mac-iCal.el – import Mac OS X iCal.app events into Emacs diary
@@ -840,16 +904,16 @@ https://github.com/ndw/org-mac-iCal
   (interactive)
   ;; (find-file "~/.doom.d/config.org")
   (find-file (concat (getenv "HOME") "/.doom.d/config.org")))
-(global-set-key (kbd "<escape> <escape> e") 'tru/visit-emacs-config)
+(global-set-key (kbd "ESC ESC e") 'tru/visit-emacs-config)
 
 (defun tru/visit-project-scratch ()
   (interactive)
   (doom/switch-to-project-scratch-buffer))
-(global-set-key (kbd "<escape> <escape> x") 'tru/visit-project-scratch)
+(global-set-key (kbd "ESC ESC x") 'tru/visit-project-scratch)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "<escape> <escape> 1") 'doom/switch-to-scratch-buffer)
+(global-set-key (kbd "ESC ESC 1") 'doom/switch-to-scratch-buffer)
 #+END_SRC
 
 ** sudo edit
@@ -1305,8 +1369,8 @@ https://discourse.doomemacs.org/t/permanently-display-workspaces-in-minibuffer/8
   (put 'mc/mark-previous-like-this 'repeat-map 'doom-leader-multiple-cursors-map)
   (put 'mc/unmark-previous-like-this 'repeat-map 'doom-leader-multiple-cursors-map)
 
-  (define-key ctrl-q-map "c" 'tab-new)
-  (define-key ctrl-q-map "\C-c" 'centaur-tabs--create-new-empty-buffer)
+  (define-key ctrl-q-map "\C-c" 'tab-new)
+  (define-key ctrl-q-map "c" 'centaur-tabs--create-new-empty-buffer)
   (define-key ctrl-q-map "\C-w" '+workspace/switch-to)
 )
 #+end_src
@@ -1314,8 +1378,8 @@ https://discourse.doomemacs.org/t/permanently-display-workspaces-in-minibuffer/8
 ** god mode
 #+begin_src emacs-lisp
 (after! god-mode
-  (global-set-key (kbd "<escape> <escape> <escape>") #'god-local-mode)
-  (global-set-key (kbd "<escape> q") #'god-local-mode)
+  (global-set-key (kbd "ESC ESC ESC") #'god-local-mode)
+  (global-set-key (kbd "ESC q") #'god-local-mode)
   (define-key god-local-mode-map (kbd "i") #'god-local-mode)
   (define-key god-local-mode-map (kbd "z") #'repeat)
   (define-key god-local-mode-map (kbd ".") #'repeat)
@@ -1341,6 +1405,46 @@ https://discourse.doomemacs.org/t/permanently-display-workspaces-in-minibuffer/8
   (define-key god-local-mode-map (kbd "O") 'spacer)
   (defun spacer (times)  (interactive "p") (dotimes (x times) (insert " ")))
 )
+#+end_src
+
+** emamux
+https://github.com/emacsorphanage/emamux
+
+#+begin_src emacs-lisp
+(use-package! emamux)
+#+end_src
+
+** fzf.el
+https://github.com/bling/fzf.el
+
+#+begin_src emacs-lisp
+(use-package! fzf
+  :bind
+    ;; Don't forget to set keybinds!
+  :config
+  (setq fzf/args "-x --color bw --print-query --margin=1,0 --no-hscroll"
+        fzf/executable "fzf"
+        fzf/git-grep-args "-i --line-number %s"
+        ;; command used for `fzf-grep-*` functions
+        ;; example usage for ripgrep:
+        fzf/grep-command "rg --no-heading -nH"
+        ;;fzf/grep-command "grep -nrH"
+        ;; If nil, the fzf buffer will appear at the top of the window
+        fzf/position-bottom t
+        fzf/window-height 20))
+#+end_src
+
+** GitHub Copilot.el
+https://github.com/zerolfx/copilot.el
+#+begin_src emacs-lisp
+;; accept completion from copilot and fallback to company
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (("C-TAB" . 'copilot-accept-completion-by-word)
+         ("C-<tab>" . 'copilot-accept-completion-by-word)
+         :map copilot-completion-map
+         ("<tab>" . 'copilot-accept-completion)
+         ("TAB" . 'copilot-accept-completion)))
 #+end_src
 
 * Org                                                                           :org:
@@ -1555,8 +1659,7 @@ https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/
                      (top . 400) (left . 300)
                      ))
        (select-frame-by-name "remember")
-       (org-roam-node-insert-immediate))
-
+       (my/org-roam-capture-inbox))
 
      ;;     (add-to-list 'default-frame-alist '(height . 39))
      ;;     (add-to-list 'default-frame-alist '(width . 124))
@@ -1580,15 +1683,15 @@ https://www.reddit.com/r/emacs/comments/7zqc7b/share_your_org_capture_templates/
 (defun tru/visit-my-org-daily ()
   (interactive)
   (find-file "~/Dropbox/Org/daily.org"))
-(global-set-key (kbd "<escape> <escape> d") 'tru/visit-my-org-daily)
+(global-set-key (kbd "ESC ESC d") 'tru/visit-my-org-daily)
 (defun tru/visit-my-org-inbox ()
   (interactive)
-  (find-file "~/Dropbox/Org/inbox.org"))
-(global-set-key (kbd "<escape> <escape> i") 'tru/visit-my-org-inbox)
+  (find-file "~/Dropbox/Org/org-roam/Inbox.org"))
+(global-set-key (kbd "ESC ESC i") 'tru/visit-my-org-inbox)
 (defun tru/visit-my-org-journal ()
   (interactive)
   (find-file "~/Dropbox/Org/journal.org"))
-(global-set-key (kbd "<escape> <escape> j") 'tru/visit-my-org-journal)
+(global-set-key (kbd "ESC ESC j") 'tru/visit-my-org-journal)
 #+END_SRC
 
 ** Org ansi
@@ -1770,41 +1873,116 @@ https://emacs-china.org/t/org-mode/13248
 #+begin_src emacs-lisp
 (setq org-roam-capture-templates
       '(
-        ("w" "workstuff" plain (file "/Users/tru/Dropbox/Org/org-roam/templates/workstuff.org")
+        ("d" "default" plain "* %?"
+         :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                            "#+title: ${title}\n#+created: %U\n\n") :unnarrowed t)
+        ("w" "workstuff" plain "* ${title}\n\n%?\n"
          :target (file+head "work/%<%Y%m%d%H%M%S>-${slug}.org"
-                            "#+title: ${title}\n") :unnarrowed t)
+                            "#+title: ${title}\n#+category: ${title}\n#+filetags: :details:") :unnarrowed t)
         ("r" "research" plain (file "/Users/tru/Dropbox/Org/org-roam/templates/research.org")
          :target (file+head "study/%<%Y%m%d%H%M%S>-${slug}.org"
                             "#+title: ${title}\n") :unnarrowed t)
-        )
+        ("s" "sql" plain "* RDS ${title}\n\n%?\n"
+         :if-new (file+head "sql/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: :rds:sql:details:")
+         :unnarrowed t)
+        ("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
+         :if-new (file+head "${slug}.org" "#+title: ${title}\n#+category: ${title}\n#+filetags: Project")
+         :unnarrowed t)
+        ))
+#+end_src
+
+#+begin_src emacs-lisp
+(after! org-roam
+  ;; https://systemcrafters.net/build-a-second-brain-in-emacs/5-org-roam-hacks/
+  ;; Bind this to C-c n I
+
+(defun my/org-roam-filter-by-tag (tag-name)
+  (lambda (node)
+    (member tag-name (org-roam-node-tags node))))
+
+(defun my/org-roam-list-notes-by-tag (tag-name)
+  (mapcar #'org-roam-node-file
+          (seq-filter
+           (my/org-roam-filter-by-tag tag-name)
+           (org-roam-node-list))))
+
+(defun my/org-roam-refresh-agenda-list ()
+  (interactive)
+  (setq org-agenda-files (my/org-roam-list-notes-by-tag "Project")))
+
+;; Do not refresh this automatically during startup.  It can trigger
+;; `org-roam-db-sync', which may prompt on large org-roam files before the
+;; first frame is usable.
+;; (my/org-roam-refresh-agenda-list)
 )
 #+end_src
 
 #+begin_src emacs-lisp
-  (after! org-roam
-  ;; https://systemcrafters.net/build-a-second-brain-in-emacs/5-org-roam-hacks/
-  ;; Bind this to C-c n I
-  (defun org-roam-node-insert-immediate (arg &rest args)
-    (interactive "P")
-    (let ((args (cons arg args))
-          (org-roam-capture-templates (list (append (car org-roam-capture-templates)
-                                                    '(:immediate-finish t)))))
-      (apply #'org-roam-node-insert args)))
-          )
+(defun my/org-roam-capture-inbox ()
+  (interactive)
+  (org-roam-capture- :node (org-roam-node-create)
+                     :templates '(("i" "inbox" plain "* TODO %?\n%U\n"
+                                   :if-new (file+head "Inbox.org" "#+title: Inbox\n")))))
+(defun my/org-roam-copy-todo-to-today ()
+  (interactive)
+  (let ((org-refile-keep t) ;; Set this to nil to delete the original!
+        (org-roam-dailies-capture-templates
+          '(("t" "tasks" entry "%?"
+             :if-new (file+head+olp "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n" ("Tasks")))))
+        (org-after-refile-insert-hook #'save-buffer)
+        today-file
+        pos)
+    (save-window-excursion
+      (org-roam-dailies--capture (current-time) t)
+      (setq today-file (buffer-file-name))
+      (setq pos (point)))
+
+    ;; Only refile if the target file is different than the current file
+    (unless (equal (file-truename today-file)
+                   (file-truename (buffer-file-name)))
+      (org-refile nil nil (list "Tasks" today-file nil pos)))))
+(defun org-roam-node-insert-immediate (arg &rest args)
+  (interactive "P")
+  (let ((args (push arg args))
+        (org-roam-capture-templates (list (append (car org-roam-capture-templates)
+                                                  '(:immediate-finish t)))))
+    (apply #'org-roam-node-insert args)))
 #+end_src
 
+[[https://gitlab.com/aimebertrand/dotemacs/-/blob/main/libraries/timu-org-roam.el][libraries/timu-org-roam.el · main · Aimé Bertrand / dotemacs · GitLab]]
 #+begin_src emacs-lisp
-;;; Code:
-(defun make-orgcapture-frame (&optional mytext)
-  "Create a new frame and run org-capture."
-  (interactive)
-  (setq org-mac-context mytext)
-  (make-frame '((name . "remember") (width . 100) (height . 30)
-                (top . 400) (left . 300)
-                ))
-  (select-frame-by-name "remember")
-  (org-roam-node-insert-immediate))
+;; showing backlink count in the completion
+(cl-defmethod org-roam-node-backlinkscount ((node org-roam-node))
+  (let* ((count (caar (org-roam-db-query
+                       [:select (funcall count source)
+                                :from links
+                                :where (= dest $s1)
+                                :and (= type "id")]
+                       (org-roam-node-id node)))))
+    (format "[%d]" count)))
+#+end_src
 
+https://www.reddit.com/r/DoomEmacs/comments/tcc65f/how_to_save_org_roam_note_to_different_location/
+#+begin_src emacs-lisp
+(setq my-roam-capture-copy-template
+  '(("c" "'Copy' of current note" plain "%?"
+     :if-new (file+head "%(plist-get org-roam-capture--info :parent-roam-dir)%<%Y%m%d%H%M%S>-${slug}.org"
+              "#+TITLE: ${title}\n#+CREATED: %U\n#+CATEGORY: ${title}\n#+FILETAGS: details\n\n")
+     :unnarrowed t
+     :immediate-finish t)))
+
+(defun my-org-roam-node-insert ()
+  "If current buffer is org-roam note, setup capture template for 'copying' origin of source roam buffer."
+  (interactive)
+  (let ((roam-id (org-id-get 0)) ;; 0 to get file roam ids
+       (buffer-roam-dir (replace-regexp-in-string org-roam-directory "" (file-name-directory (buffer-file-name)))))
+       (if roam-id
+         ;; call capture with 'copy note' template
+         (org-roam-node-insert nil
+              :templates (append org-roam-capture-templates my-roam-capture-copy-template)
+              :info (list :parent-id roam-id :parent-roam-dir buffer-roam-dir) )
+         ;; call default roam insert mechanism
+         (org-roam-node-insert))))
 #+end_src
 
 *** org-roam-ui
@@ -1916,6 +2094,33 @@ https://github.com/daviwil/dotfiles/blob/master/Emacs.org#presentations
 
 ** Auto babel tangle
 #+begin_src emacs-lisp
+(defun my/org-babel-add-tangle-no-opt ()
+  "Add :tangle no option to src when tag is noexport."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "^\\s-*#\\+begin_src\\s-+\\(.*\\)\\s-*$" nil t)
+      (let ((lang (match-string 1)))
+        (when (and (member "noexport" (org-get-tags-at))
+                   (not (string-match-p ":tangle[[:space:]]+no" (match-string 0))))
+          (replace-match (concat lang " :tangle no") t nil nil 1))))))
+
+;; (add-hook 'org-babel-pre-tangle-hook 'my/org-babel-add-tangle-no-opt)
+
+(defun my/org-babel-remove-tangle-no-opt ()
+    "Add :tangle no option to src when tag is noexport."
+    (interactive)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "^\\s-*#\\+begin_src\\s-+\\(.*\\)\\s-*$" nil t)
+    (let ((lang (match-string 1)))
+      (if (member "noexport" (org-get-tags-at))
+         nil
+        (replace-match (s-replace " :tangle no" "" lang) t nil nil 1 ))))))
+;; (add-hook 'org-babel-pre-tangle-hook  'my/org-babel-remove-tangle-no-opt)
+#+end_src
+
+#+begin_src emacs-lisp
 (after! org
   (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t))
 #+end_src
@@ -1955,9 +2160,13 @@ https://stackoverflow.com/questions/10969617/hiding-markup-elements-in-org-mode
   (use-package! org-mac-link
     :after org
     :config
-    (setq org-mac-grab-Acrobat-app-p nil) ; Disable grabbing from Adobe Acrobat
-    (setq org-mac-grab-devonthink-app-p nil) ; Disable grabbinb from DevonThink
-    (map! :map org-mode-map          "C-c g"  #'org-mac-link-link)))
+    (setq org-mac-link-acrobat-app-p nil) ; Disable grabbing from Adobe Acrobat
+    (setq org-mac-link-skim-app-p nil)
+    (setq org-mac-link-qutebrowser-app-p nil)
+    (setq org-mac-link-brave-app-p nil)
+    (setq org-mac-link-outlook-app-p nil)
+    (setq org-mac-link-devonthink-app-p nil) ; Disable grabbinb from DevonThink
+    (map! :map org-mode-map          "C-c g"  #'org-mac-link-get-link)))
 #+end_src
 
 * Tools
@@ -2025,7 +2234,7 @@ https://stackoverflow.com/questions/10969617/hiding-markup-elements-in-org-mode
     (when (string-match "life" (get-string-from-file "/Users/tru/Dropbox/Apps/org-agenda/.git/HEAD"))
       (setenv "NOTMUCH_CONFIG" "/Users/tru/Dropbox/Apps/emacs/tru/notmuchmail/tru.zhou/notmuch.conf")
       (setq +notmuch-mail-folder "~/Dropbox/Apps/emacs/tru/notmuchmail/tru.zhou"))
-    (unless (featurep! :ui workspaces)
+    (unless (modulep! :ui workspaces)
       (user-error ":ui workspaces is required, but disabled"))
     (condition-case-unless-debug e
         (progn
@@ -2116,7 +2325,7 @@ https://stackoverflow.com/questions/10969617/hiding-markup-elements-in-org-mode
       (notmuch-show-toggle-message))))
 #+end_src
 
-* Misc
+
 ** TODO Auto-Correct Words
 
   =void-function ispell-get-word=
@@ -2171,4 +2380,8 @@ https://stackoverflow.com/questions/10969617/hiding-markup-elements-in-org-mode
     (setq save-abbrevs 'silently)
     (setq-default abbrev-mode t)
   #+END_SRC
-  
+
+* Misc
+#+begin_src emacs-lisp
+(load! "misc/misc.el")
+#+end_src

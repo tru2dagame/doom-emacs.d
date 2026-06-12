@@ -77,4 +77,49 @@
 (package! git-auto-commit-mode)
 (package! easy-hugo)
 (package! org-auto-tangle)
+(package! emamux)
+(package! fzf)
+
+;; f.el 0.20.0 has a shortdoc keyword typo that breaks Emacs 30.
+(package! f :pin "931b6d0667fe03e7bf1c6c282d6d8d7006143c52")
+
+;; Emacs 29+ provides Docker TRAMP through the built-in tramp-container.
+(package! docker-tramp :disable t)
+
+(package! copilot
+  :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+
+;; Doom+'s Go doctor still checks this when :lang go is used without +lsp.
+(package! company-go :pin "31948b463f2fc18f8801e5a8fe511fef300eb3dd")
+
+;; MELPA no longer ships a standalone git-commit recipe, but Magit still
+;; declares it as a dependency and includes it in the Magit repo.
+(package! git-commit
+  :recipe (:host github
+           :repo "magit/magit"
+           :files ("lisp/git-commit.el" "lisp/git-commit-pkg.el"))
+  :pin "c800f79c2061621fde847f6a53129eca0e8da728")
+
+;; org-roam >= 2.3 needs EmacSQL 4.x's SQLite interface.
+(package! emacsql :pin "d811bbefcb5e27841af55cae53aa939ba720de77")
+
+;; Same issue as git-commit: this split package is provided by the parent
+;; repository, but no longer has a standalone MELPA recipe.
+(package! emacsql-sqlite
+  :recipe (:host github
+           :repo "magit/emacsql"
+           :files ("emacsql-sqlite.el"
+                   "emacsql-sqlite-builtin.el"
+                   "emacsql-sqlite-module.el"))
+  :pin "d811bbefcb5e27841af55cae53aa939ba720de77")
+
+;; Upstream renamed master to main; spell it out so straight doesn't try the
+;; removed branch while updating this long-lived package checkout.
+(package! package-lint
+  :recipe (:host github
+           :repo "purcell/package-lint"
+           :branch "main"
+           :files (:defaults "data" (:exclude "*flymake.el")))
+  :pin "7e2dfcf99011fa82d92baba973841db717657964")
+
 ;; end
