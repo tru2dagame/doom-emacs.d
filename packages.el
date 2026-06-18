@@ -86,9 +86,6 @@
 ;; Emacs 29+ provides Docker TRAMP through the built-in tramp-container.
 (package! docker-tramp :disable t)
 
-(package! copilot
-  :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
-
 ;; Doom+'s Go doctor still checks this when :lang go is used without +lsp.
 (package! company-go :pin "31948b463f2fc18f8801e5a8fe511fef300eb3dd")
 

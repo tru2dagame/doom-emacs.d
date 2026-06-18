@@ -69,7 +69,6 @@
   - [[#god-mode][god mode]]
   - [[#emamux][emamux]]
   - [[#fzfel][fzf.el]]
-  - [[#github-copilotel][GitHub Copilot.el]]
 - [[#org][Org]]
   - [[#org-settings-from-purcell][Org settings from purcell]]
   - [[#org-capture-template][Org capture template]]
@@ -1432,19 +1431,6 @@ https://github.com/bling/fzf.el
         ;; If nil, the fzf buffer will appear at the top of the window
         fzf/position-bottom t
         fzf/window-height 20))
-#+end_src
-
-** GitHub Copilot.el
-https://github.com/zerolfx/copilot.el
-#+begin_src emacs-lisp
-;; accept completion from copilot and fallback to company
-(use-package! copilot
-  :hook (prog-mode . copilot-mode)
-  :bind (("C-TAB" . 'copilot-accept-completion-by-word)
-         ("C-<tab>" . 'copilot-accept-completion-by-word)
-         :map copilot-completion-map
-         ("<tab>" . 'copilot-accept-completion)
-         ("TAB" . 'copilot-accept-completion)))
 #+end_src
 
 * Org                                                                           :org:
