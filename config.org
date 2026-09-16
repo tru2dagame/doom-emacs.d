@@ -148,6 +148,19 @@
 ;; If you want to change the style of line numbers, change this to `relative' or
 ;; `nil' to disable it:
 (setq display-line-numbers-type t)
+
+;; tmux DA replies can otherwise leak into Magit as a literal `c' key.
+(defun tru/kkp-enable-outside-tmux-a (orig-fn &optional terminal)
+  "Enable KKP only when TERMINAL's frame was not opened from tmux."
+  (let* ((terminal (or terminal (frame-terminal)))
+         (frame (car (frames-on-display-list terminal)))
+         (tmux (and frame (getenv "TMUX" frame))))
+    (unless (and tmux (not (equal tmux "")))
+      (funcall orig-fn terminal))))
+
+(with-eval-after-load 'kkp
+  (advice-add 'kkp-enable-in-terminal :around
+              #'tru/kkp-enable-outside-tmux-a))
 #+end_src
 
 * UI
