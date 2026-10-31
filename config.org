@@ -101,6 +101,7 @@
   - [[#email][Email]]
     - [[#mu4e][+mu4e+]]
     - [[#notmuch][notmuch]]
+  - [[#rex-scrollback][REX scrollback]]
   - [[#auto-correct-words][Auto-Correct Words]]
 - [[#misc][Misc]]
 
@@ -416,7 +417,11 @@
 (global-set-key (kbd "C-S-<tab>") 'tab-bar-switch-to-prev-tab)
 (global-set-key (kbd "C-q H") 'tab-bar-switch-to-prev-tab)
 (global-set-key (kbd "C-q L") 'tab-bar-switch-to-next-tab)
-(global-set-key (kbd "M-[") 'tab-bar-switch-to-prev-tab)
+;; In a TTY, ESC [ starts terminal reports, including SGR mouse events.
+;; Keep Option+[ for GUI frames and let TTY frames decode those reports.
+(define-key global-map (kbd "M-[")
+  '(menu-item "" tab-bar-switch-to-prev-tab
+    :filter (lambda (command) (and (display-graphic-p) command))))
 (global-set-key (kbd "M-]") 'tab-bar-switch-to-next-tab)
 (global-set-key (kbd "C-s-f") 'tab-move)
 (global-set-key (kbd "C-s-b") 'tab-move-to)
@@ -2324,6 +2329,128 @@ https://stackoverflow.com/questions/10969617/hiding-markup-elements-in-org-mode
       (notmuch-show-toggle-message))))
 #+end_src
 
+
+** REX scrollback
+
+REX exports terminal scrollback and opens an editable temporary copy in Emacs. Both GUI and TUI clients use the current Emacs server.
+
+The GUI and TUI launch actions and their keybindings are configured in =~/.config/rex/emacs.lua=. The Emacs configuration below prepares the snapshot buffer and provides the return command.
+
+| Emacs action                                      | Shortcut |
+|---------------------------------------------------+----------|
+| Return to the source REX session and pane           | C-c C-r  |
+| Finish the TUI client with Emacs's built-in command | C-x #    |
+
+Returning to REX from a GUI frame keeps the snapshot buffer open. Finishing the TUI client removes its temporary copy. Save a separate copy to keep your edits. Edits to a snapshot are not sent back to the terminal.
+
+#+begin_src emacs-lisp
+(require 'json)
+(require 'server)
+(require 'subr-x)
+
+(defvar-local tru/rex-scrollback-context nil)
+(defvar-local tru/rex-scrollback-directory nil)
+
+(defun tru/rex-scrollback--cleanup ()
+  "Remove only the private temporary directory belonging to this snapshot."
+  (when (and tru/rex-scrollback-directory
+             (file-directory-p tru/rex-scrollback-directory)
+             (string-prefix-p "rex-emacs."
+                              (file-name-nondirectory
+                               (directory-file-name tru/rex-scrollback-directory)))
+             (file-in-directory-p tru/rex-scrollback-directory temporary-file-directory))
+    (condition-case nil
+        (delete-directory tru/rex-scrollback-directory t)
+      (file-error nil))))
+
+(defun tru/rex-scrollback--command (&rest arguments)
+  "Run Rex with ARGUMENTS using this snapshot's explicit local endpoint."
+  (let* ((context tru/rex-scrollback-context)
+         (program (alist-get 'rex_program context))
+         (endpoint (alist-get 'endpoint context)))
+    (with-temp-buffer
+      (let ((status (apply #'call-process program nil t nil
+                           "--autostart=false" "--timeout" "5s"
+                           "--server" endpoint arguments)))
+        (unless (eq status 0)
+          (error "Rex: %s" (string-trim (buffer-string))))))))
+
+(defun tru/rex-scrollback-return ()
+  "Return to the source Rex pane; finish the client when in a TUI frame."
+  (interactive)
+  (unless tru/rex-scrollback-context
+    (user-error "This buffer is not a Rex scrollback snapshot"))
+  (let* ((context tru/rex-scrollback-context)
+         (session (alist-get 'session_id context))
+         (block (alist-get 'block_id context))
+         (client (alist-get 'client_id context)))
+    (tru/rex-scrollback--command "focus" "--session" session block)
+    (when (and client (not (string-empty-p client)))
+      (tru/rex-scrollback--command "--client" client "do" "session.select"
+                                   (concat "session_id=" session)))
+    (if (display-graphic-p)
+        (start-process "return-to-rex" nil "/usr/bin/open" "-b" "com.superlogical.rex")
+      (server-edit))))
+
+(defvar tru/rex-scrollback-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c C-r") #'tru/rex-scrollback-return)
+    map))
+
+(define-minor-mode tru/rex-scrollback-mode
+  "Edit a Rex scrollback snapshot.  C-c C-r returns to its source pane."
+  :lighter " Rex" :keymap tru/rex-scrollback-mode-map)
+
+(defconst tru/rex-scrollback-file-regexp
+  "/rex-emacs\\.[^/]+/scrollback\\.txt\\'")
+
+(defun tru/rex-scrollback--setup-buffer ()
+  "Restore snapshot state when an Emacs client reinitializes its major mode."
+  (when (and buffer-file-name
+             (string-match-p tru/rex-scrollback-file-regexp buffer-file-name)
+             (file-in-directory-p buffer-file-name temporary-file-directory))
+    (let* ((directory (file-name-directory buffer-file-name))
+           (context-file (expand-file-name "context.json" directory)))
+      (when (file-readable-p context-file)
+        (let ((context (with-temp-buffer
+                         (insert-file-contents context-file)
+                         (json-parse-buffer :object-type 'alist :array-type 'list
+                                            :null-object nil :false-object nil))))
+          (setq-local tru/rex-scrollback-context context
+                      tru/rex-scrollback-directory directory
+                      buffer-read-only nil
+                      make-backup-files nil
+                      backup-inhibited t
+                      enable-local-variables nil
+                      enable-local-eval nil
+                      server-temp-file-regexp
+                      (concat "\\`" (regexp-quote buffer-file-name) "\\'"))
+          (auto-save-mode -1)
+          (tru/rex-scrollback-mode 1)
+          (add-hook 'kill-buffer-hook #'tru/rex-scrollback--cleanup nil t)
+          (rename-buffer (format "*REX scrollback %s %s*"
+                                 (alist-get 'mode context)
+                                 (substring (alist-get 'block_id context) -8)) t))))))
+
+;; emacsclient --tty may run normal-mode again after preparing a buffer.
+(add-hook 'after-change-major-mode-hook #'tru/rex-scrollback--setup-buffer)
+(add-to-list 'inhibit-local-variables-regexps tru/rex-scrollback-file-regexp)
+
+(defun tru/rex-scrollback-prepare (directory)
+  "Prepare DIRECTORY's snapshot without selecting or raising a frame."
+  (let* ((directory (file-name-as-directory (expand-file-name directory)))
+         (file (expand-file-name "scrollback.txt" directory))
+         ;; Terminal output is data, including anything resembling file-local code.
+         (buffer (let ((enable-local-variables nil)
+                       (enable-local-eval nil))
+                   (find-file-noselect file))))
+    (with-current-buffer buffer
+      (fundamental-mode)
+      (tru/rex-scrollback--setup-buffer)
+      (goto-char (point-max))
+      (set-buffer-modified-p nil))
+    (buffer-name buffer)))
+#+end_src
 
 ** TODO Auto-Correct Words
 
