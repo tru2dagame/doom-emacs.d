@@ -2334,22 +2334,33 @@ https://stackoverflow.com/questions/10969617/hiding-markup-elements-in-org-mode
 
 REX exports terminal scrollback and opens an editable temporary copy in Emacs. Both GUI and TUI clients use the current Emacs server.
 
-The GUI and TUI launch actions and their keybindings are configured in =~/.config/rex/emacs.lua=. The Emacs configuration below prepares the snapshot buffer and provides the return command.
+The GUI and TUI launch actions and their keybindings are configured in =~/.config/rex/emacs.lua=. The Emacs configuration below prepares the snapshot buffer, renders terminal colors, and provides the return command.
 
 | Emacs action                                      | Shortcut |
 |---------------------------------------------------+----------|
 | Return to the source REX session and pane           | C-c C-r  |
 | Finish the TUI client with Emacs's built-in command | C-x #    |
 
-Returning to REX from a GUI frame keeps the snapshot buffer open. Finishing the TUI client removes its temporary copy. Save a separate copy to keep your edits. Edits to a snapshot are not sent back to the terminal.
+The TUI client opens in a temporary floating layer inside the REX window. Finishing the client closes that layer and removes its temporary copy. Returning to REX from a GUI frame keeps the snapshot buffer open. Save a separate copy to keep your edits. Edits to a snapshot are not sent back to the terminal.
 
 #+begin_src emacs-lisp
 (require 'json)
 (require 'server)
 (require 'subr-x)
+(require 'ansi-color)
 
 (defvar-local tru/rex-scrollback-context nil)
 (defvar-local tru/rex-scrollback-directory nil)
+
+(defun tru/rex-scrollback--colorize ()
+  "Render terminal SGR colors in this snapshot and remove escape sequences."
+  (let ((ansi-color-context-region nil)
+        (ansi-color-apply-face-function #'ansi-color-apply-overlay-face))
+    (save-excursion
+      (goto-char (point-min))
+      (while (search-forward "\r" nil t)
+        (replace-match "" t t)))
+    (ansi-color-apply-on-region (point-min) (point-max))))
 
 (defun tru/rex-scrollback--cleanup ()
   "Remove only the private temporary directory belonging to this snapshot."
@@ -2447,6 +2458,8 @@ Returning to REX from a GUI frame keeps the snapshot buffer open. Finishing the 
     (with-current-buffer buffer
       (fundamental-mode)
       (tru/rex-scrollback--setup-buffer)
+      (when (equal (alist-get 'format tru/rex-scrollback-context) "vt")
+        (tru/rex-scrollback--colorize))
       (goto-char (point-max))
       (set-buffer-modified-p nil))
     (buffer-name buffer)))
